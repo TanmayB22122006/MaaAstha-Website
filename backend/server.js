@@ -1,27 +1,24 @@
-const express = require('express');
-const mongoose = require('mongoose'); // Database se connect karne wala tool
-const cors = require('cors');
-require('dotenv').config(); // .env file se secrets padhne ke liye
+const express = require("express");
+const dotenv = require("dotenv");
+const cors = require("cors");
+const connectDB = require("./config/db");
+
+const personRoutes = require("./routes/personRoutes");
+
+dotenv.config();
+connectDB();
 
 const app = express();
-
-// Middlewares
 app.use(cors());
 app.use(express.json());
 
-// MongoDB Connection ka Jadoo
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('✅ MongoDB Database ekdum jhakkaas Connect Ho Gaya Bhai! 🎉'))
-  .catch((error) => console.log('❌ MongoDB Connection Error:', error));
-
-// Test Route
-app.get('/', (req, res) => {
-  res.send('Bhai, Maa Astha NGO ka Backend ekdum mast chal raha hai! 🚀');
+app.get("/", (req, res) => {
+  res.send("Maa Astha API is running perfectly! 🚀");
 });
 
-// Port Setup
-const PORT = process.env.PORT || 5000;
+app.use("/api/persons", personRoutes);
 
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port: ${PORT}`);
+  console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
 });

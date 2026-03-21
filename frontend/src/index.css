@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-/* 🔥 Ye line Tailwind v4 ko batati hai ki manual dark class use karni hai */
 @variant dark (&:where(.dark, .dark *));
 
 @theme {

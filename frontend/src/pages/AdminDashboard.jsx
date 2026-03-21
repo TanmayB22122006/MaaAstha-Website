@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 // --- SUB-COMPONENTS ---
-// (Sub-components mein grid pehle se hi md:grid-cols-X set hain, toh wo automatically responsive hain)
 
 const StatCard = ({ title, value, subtitle, colorClass }) => (
   <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-gray-700 transition-colors duration-300">
@@ -18,44 +17,73 @@ const StatCard = ({ title, value, subtitle, colorClass }) => (
   </div>
 );
 
-const DashboardOverview = () => (
-  <div className="space-y-6">
-    <div>
-      <h1 className="text-2xl font-bold text-ngo-dark dark:text-white font-heading transition-colors">
-        Shelter Overview
-      </h1>
-      <p className="text-gray-500 dark:text-gray-400 font-sans">
-        Current status and recent activities at Maa Astha.
-      </p>
+const DashboardOverview = () => {
+  const [stats, setStats] = useState({
+    totalSheltered: 0,
+    reunited: 0,
+    medicalNeeds: 0,
+    recentlyAdded: 0,
+  });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/persons/stats");
+        const data = await response.json();
+        if (data.success) {
+          setStats(data.data);
+        }
+      } catch (error) {
+        console.error("Stats fetch error:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  return (
+    <div className="space-y-6 transition-colors duration-300">
+      <div>
+        <h1 className="text-2xl font-bold text-ngo-dark dark:text-white font-heading transition-colors duration-300">
+          Shelter Overview
+        </h1>
+        <p className="text-gray-500 dark:text-gray-400 font-sans transition-colors duration-300">
+          Current status and recent activities at Maa Astha.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard
+          title="Total Sheltered"
+          value={isLoading ? "..." : stats.totalSheltered}
+          subtitle="Currently in shelter"
+          colorClass="text-ngo-green dark:text-green-400"
+        />
+        <StatCard
+          title="Recently Added"
+          value={isLoading ? "..." : stats.recentlyAdded}
+          subtitle="Last 7 days"
+          colorClass="text-ngo-light dark:text-green-300"
+        />
+        <StatCard
+          title="Reunited"
+          value={isLoading ? "..." : stats.reunited}
+          subtitle="With family"
+          colorClass="text-ngo-dark dark:text-white"
+        />
+        <StatCard
+          title="Medical Needs"
+          value={isLoading ? "..." : stats.medicalNeeds}
+          subtitle="Requires attention"
+          colorClass="text-ngo-red dark:text-red-400"
+        />
+      </div>
     </div>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <StatCard
-        title="Total Sheltered"
-        value="142"
-        subtitle="+3 this week"
-        colorClass="text-ngo-green dark:text-green-400"
-      />
-      <StatCard
-        title="Recently Added"
-        value="12"
-        subtitle="Last 7 days"
-        colorClass="text-ngo-light dark:text-green-300"
-      />
-      <StatCard
-        title="Reunited"
-        value="89"
-        subtitle="All time"
-        colorClass="text-ngo-dark dark:text-white"
-      />
-      <StatCard
-        title="Medical Needs"
-        value="15"
-        subtitle="Requires attention"
-        colorClass="text-ngo-red dark:text-red-400"
-      />
-    </div>
-  </div>
-);
+  );
+};
 
 const AddPerson = () => {
   const initialForm = {
@@ -73,12 +101,30 @@ const AddPerson = () => {
   };
   const [formData, setFormData] = useState(initialForm);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert(
-      "Official Register Record saved successfully! (Backend integration pending)",
-    );
-    setFormData(initialForm);
+
+    try {
+      const response = await fetch("http://localhost:5000/api/persons/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert("✅ Record saved successfully in Database!");
+        setFormData(initialForm);
+      } else {
+        alert("❌ Error: " + data.message);
+      }
+    } catch (error) {
+      console.error("Error saving record:", error);
+      alert("⚠️ Could not connect to the backend server!");
+    }
   };
 
   return (
@@ -300,68 +346,144 @@ const AddPerson = () => {
 };
 
 const Records = () => {
-  const [records] = useState([
-    {
-      id: 1,
-      name: "Unknown Male",
-      age: 45,
-      location: "Central Station",
-      status: "Sheltered",
-    },
-    {
-      id: 2,
-      name: "Sunita Sharma",
-      age: 62,
-      location: "Market Road",
-      status: "Reunited",
-    },
-  ]);
+  const [records, setRecords] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchRecords = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("http://localhost:5000/api/persons/all");
+      const data = await response.json();
+      if (data.success) setRecords(data.data);
+    } catch (error) {
+      console.error("Fetch error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRecords();
+  }, []);
+
+  const handleStatusUpdate = async (id, currentStatus) => {
+    const newStatus = currentStatus === "Sheltered" ? "Reunited" : "Sheltered";
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/persons/update/${id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: newStatus }),
+        },
+      );
+      if (response.ok) fetchRecords();
+    } catch (error) {
+      alert("Update failed!");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Bhai, pakka delete karna hai?")) {
+      try {
+        await fetch(`http://localhost:5000/api/persons/delete/${id}`, {
+          method: "DELETE",
+        });
+        fetchRecords();
+      } catch (error) {
+        alert("Delete failed!");
+      }
+    }
+  };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden font-sans transition-colors duration-300">
-      <div className="p-6 border-b border-gray-100 dark:border-gray-700">
-        <h2 className="text-xl font-bold text-ngo-dark dark:text-white font-heading">
+      <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center transition-colors duration-300">
+        <h2 className="text-xl font-bold text-ngo-dark dark:text-white font-heading transition-colors duration-300">
           Shelter Records
         </h2>
+        <button
+          onClick={fetchRecords}
+          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-300 active:scale-95"
+        >
+          <span className={isLoading ? "animate-spin" : ""}>🔄</span>
+          {isLoading ? "Fetching..." : "Refresh"}
+        </button>
       </div>
+
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse min-w-[600px]">
+        <table className="w-full text-left border-collapse min-w-[700px]">
           <thead>
-            <tr className="bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 text-sm border-b dark:border-gray-700">
-              <th className="p-4">Name</th>
-              <th className="p-4">Age</th>
-              <th className="p-4">Location Found</th>
-              <th className="p-4">Status</th>
+            <tr className="bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 text-sm border-b dark:border-gray-700 transition-colors duration-300">
+              <th className="p-4 font-semibold uppercase tracking-wider">
+                Name
+              </th>
+              <th className="p-4 font-semibold uppercase tracking-wider">
+                Status
+              </th>
+              <th className="p-4 font-semibold uppercase tracking-wider text-center">
+                Actions
+              </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-            {records.map((record) => (
-              <tr
-                key={record.id}
-                className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-              >
-                <td className="p-4 font-medium text-gray-800 dark:text-gray-200">
-                  {record.name}
-                </td>
-                <td className="p-4 text-gray-600 dark:text-gray-400">
-                  {record.age}
-                </td>
-                <td className="p-4 text-gray-600 dark:text-gray-400">
-                  {record.location}
-                </td>
-                <td className="p-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      record.status === "Reunited"
-                        ? "bg-green-100 dark:bg-green-900/30 text-ngo-green dark:text-green-400"
-                        : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
-                    }`}
-                  >
-                    {record.status}
-                  </span>
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-700 transition-colors duration-300">
+            {isLoading && records.length === 0 ? (
+              <tr>
+                <td
+                  colSpan="3"
+                  className="p-10 text-center text-gray-500 dark:text-gray-400 transition-colors duration-300"
+                >
+                  Loading database...
                 </td>
               </tr>
-            ))}
+            ) : records.length === 0 ? (
+              <tr>
+                <td
+                  colSpan="3"
+                  className="p-10 text-center text-gray-500 dark:text-gray-400 transition-colors duration-300"
+                >
+                  No records found.
+                </td>
+              </tr>
+            ) : (
+              records.map((record) => (
+                <tr
+                  key={record._id}
+                  className="hover:bg-gray-50/80 dark:hover:bg-gray-700/40 transition-colors duration-300"
+                >
+                  <td className="p-4 font-medium text-gray-800 dark:text-gray-200 transition-colors duration-300">
+                    {record.fullName}
+                  </td>
+                  <td className="p-4">
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-bold tracking-wide transition-colors duration-300 ${
+                        record.status === "Reunited"
+                          ? "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400"
+                          : "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                      }`}
+                    >
+                      {record.status}
+                    </span>
+                  </td>
+                  <td className="p-4 flex justify-center gap-3">
+                    <button
+                      onClick={() =>
+                        handleStatusUpdate(record._id, record.status)
+                      }
+                      className="text-xs font-bold uppercase bg-ngo-green/10 text-ngo-green dark:text-green-400 px-3 py-1.5 rounded-md hover:bg-ngo-green hover:text-white transition-all duration-300 shadow-sm"
+                    >
+                      Update
+                    </button>
+                    <button
+                      onClick={() => handleDelete(record._id)}
+                      className="text-xs font-bold uppercase bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400 px-3 py-1.5 rounded-md hover:bg-red-500 hover:text-white transition-all duration-300 shadow-sm"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -375,7 +497,6 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
 
-  // 🔥 New State for Mobile Sidebar Toggle
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -390,7 +511,7 @@ const AdminDashboard = () => {
 
   const handleTabChange = (tabId) => {
     setActiveTab(tabId);
-    setIsSidebarOpen(false); // Mobile pe link click karne ke baad sidebar auto-close ho jaye
+    setIsSidebarOpen(false);
   };
 
   const menuItems = [
@@ -418,7 +539,6 @@ const AdminDashboard = () => {
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900 font-sans transition-colors duration-300 overflow-hidden">
-      {/* 🔥 Mobile Overlay: Click outside to close sidebar */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
@@ -426,7 +546,6 @@ const AdminDashboard = () => {
         ></div>
       )}
 
-      {/* Sidebar: Responsive sliding behavior */}
       <div
         className={`fixed md:relative z-50 w-64 h-full bg-white dark:bg-gray-800 shadow-2xl md:shadow-lg flex flex-col border-r border-transparent dark:border-gray-700 transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
       >
@@ -439,7 +558,6 @@ const AdminDashboard = () => {
               ADMIN PORTAL
             </p>
           </div>
-          {/* Close button for Mobile Sidebar */}
           <button
             onClick={() => setIsSidebarOpen(false)}
             className="md:hidden text-gray-500 hover:text-ngo-red focus:outline-none"
@@ -478,12 +596,9 @@ const AdminDashboard = () => {
         </nav>
       </div>
 
-      {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden w-full">
-        {/* Top Header */}
         <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-100 dark:border-gray-700 p-4 flex justify-between items-center transition-colors duration-300">
           <div className="flex items-center gap-3">
-            {/* 🔥 Hamburger Button (Mobile Only) */}
             <button
               className="md:hidden p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md focus:outline-none"
               onClick={() => setIsSidebarOpen(true)}
@@ -539,7 +654,6 @@ const AdminDashboard = () => {
           </div>
         </header>
 
-        {/* Dynamic View Area */}
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 md:p-6 transition-colors duration-300">
           {renderContent()}
         </main>
