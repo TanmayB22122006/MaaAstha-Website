@@ -13,6 +13,7 @@ import Donation from "./pages/Donation";
 import Login from "./pages/Login";
 import Volunteer from "./pages/Volunteer";
 import AdminDashboard from "./pages/AdminDashboard";
+import ReportForm from "./pages/ReportForm"; 
 
 const AppContent = () => {
   const location = useLocation();
@@ -29,6 +30,7 @@ const AppContent = () => {
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/report" element={<ReportForm />} />  // ✅ ADD
             <Route path="/about" element={<About />} />
             <Route path="/missing" element={<MissingPeople />} />
             <Route path="/rescue" element={<RescueRequest />} />

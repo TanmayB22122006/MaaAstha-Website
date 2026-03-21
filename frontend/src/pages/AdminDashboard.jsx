@@ -705,6 +705,59 @@ const Volunteers = () => {
 };
 
 // ==========================================
+// 📢 REPORTS COMPONENT (NEW)
+// ==========================================
+const Reports = () => {
+  const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchReports = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/reports/all");
+      const data = await res.json();
+      if (data.success) setReports(data.data);
+    } catch (err) {
+      console.error("Report fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchReports();
+  }, []);
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-6">
+      <h2 className="text-xl font-bold mb-4">📢 Reported Connections</h2>
+
+      {loading ? (
+        <p>Loading reports...</p>
+      ) : reports.length === 0 ? (
+        <p>No reports yet.</p>
+      ) : (
+        <div className="space-y-4">
+          {reports.map((r) => (
+            <div
+              key={r._id}
+              className="border rounded-lg p-4 shadow-sm bg-gray-50 dark:bg-gray-700"
+            >
+              <p><b>Missing Person:</b> {r.personName}</p>
+              <p><b>Reporter:</b> {r.reporterName}</p>
+              <p><b>Phone:</b> {r.phone}</p>
+              <p><b>Relation:</b> {r.relation}</p>
+              {r.message && <p><b>Message:</b> {r.message}</p>}
+              <p className="text-xs text-gray-500 mt-2">
+                {new Date(r.createdAt).toLocaleString("en-IN")}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+// ==========================================
 // 🚨 RESCUE REQUESTS COMPONENT
 // ==========================================
 const RescueRequests = () => {
@@ -853,6 +906,7 @@ const AdminDashboard = () => {
     { id: "records", label: "View Records", icon: "📁" },
     { id: "donations", label: "Donations", icon: "💰" },
     { id: "volunteers", label: "Volunteers", icon: "🤝" },
+    { id: "reports", label: "Reports", icon: "📢" },
     { id: "rescues", label: "Rescue Alerts", icon: "🚨" },
   ];
 
@@ -868,6 +922,8 @@ const AdminDashboard = () => {
         return <AddPerson />;
       case "records":
         return <Records />;
+      case "reports":
+        return <Reports />;
       case "donations":
         return <Donations />;
       case "volunteers":
