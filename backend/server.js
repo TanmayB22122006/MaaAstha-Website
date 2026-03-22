@@ -5,6 +5,7 @@ const connectDB = require("./config/db");
 const path = require("path");
 
 // 👇 Saare routes yahan require kiye hain
+const contactRoutes = require("./routes/contactRoutes");
 const personRoutes = require("./routes/personRoutes");
 const donationRoutes = require("./routes/donationRoutes");
 const volunteerRoutes = require("./routes/volunteerRoutes");
@@ -28,6 +29,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/donations", donationRoutes);
 app.use("/api/volunteers", volunteerRoutes);
 app.use("/api/rescue-requests", rescueRequestRoutes);
+app.use("/api/contacts", contactRoutes);
 app.use("/api/reports", reportRoutes); // ✅ Report API ko sahi jagah lagaya
 
 // 👇 Server Listen aakhiri mein!

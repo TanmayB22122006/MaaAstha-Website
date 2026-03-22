@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 const StatCard = ({ title, value, subtitle, colorClass }) => (
   <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-gray-700 transition-colors duration-300">
     <h3 className="text-gray-500 dark:text-gray-400 text-sm font-medium font-sans">
-      {title}
+      {title}  
     </h3>
     <p className={`text-3xl font-bold mt-2 font-heading ${colorClass}`}>
       {value}
@@ -705,7 +705,7 @@ const Volunteers = () => {
 };
 
 // ==========================================
-// 📢 REPORTS COMPONENT (NEW)
+// 📢 REPORTS COMPONENT
 // ==========================================
 const Reports = () => {
   const [reports, setReports] = useState([]);
@@ -728,25 +728,25 @@ const Reports = () => {
   }, []);
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-6">
-      <h2 className="text-xl font-bold mb-4">📢 Reported Connections</h2>
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 transition-colors duration-300">
+      <h2 className="text-xl font-bold mb-4 text-ngo-dark dark:text-white">📢 Reported Connections</h2>
 
       {loading ? (
-        <p>Loading reports...</p>
+        <p className="text-gray-500 dark:text-gray-400">Loading reports...</p>
       ) : reports.length === 0 ? (
-        <p>No reports yet.</p>
+        <p className="text-gray-500 dark:text-gray-400">No reports yet.</p>
       ) : (
         <div className="space-y-4">
           {reports.map((r) => (
             <div
               key={r._id}
-              className="border rounded-lg p-4 shadow-sm bg-gray-50 dark:bg-gray-700"
+              className="border border-gray-100 dark:border-gray-700 rounded-lg p-4 shadow-sm bg-gray-50 dark:bg-gray-700/50"
             >
-              <p><b>Missing Person:</b> {r.personName}</p>
-              <p><b>Reporter:</b> {r.reporterName}</p>
-              <p><b>Phone:</b> {r.phone}</p>
-              <p><b>Relation:</b> {r.relation}</p>
-              {r.message && <p><b>Message:</b> {r.message}</p>}
+              <p className="text-gray-800 dark:text-gray-200"><b>Missing Person:</b> {r.personName}</p>
+              <p className="text-gray-800 dark:text-gray-200"><b>Reporter:</b> {r.reporterName}</p>
+              <p className="text-gray-800 dark:text-gray-200"><b>Phone:</b> {r.phone}</p>
+              <p className="text-gray-800 dark:text-gray-200"><b>Relation:</b> {r.relation}</p>
+              {r.message && <p className="text-gray-800 dark:text-gray-200"><b>Message:</b> {r.message}</p>}
               <p className="text-xs text-gray-500 mt-2">
                 {new Date(r.createdAt).toLocaleString("en-IN")}
               </p>
@@ -757,6 +757,7 @@ const Reports = () => {
     </div>
   );
 };
+
 // ==========================================
 // 🚨 RESCUE REQUESTS COMPONENT
 // ==========================================
@@ -877,6 +878,79 @@ const RescueRequests = () => {
     </div>
   );
 };
+
+// ==========================================
+// ✉️ CONTACT MESSAGES COMPONENT (NEW)
+// ==========================================
+const ContactMessages = () => {
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/contacts/all");
+        const data = await res.json();
+        if (data.success) setMessages(data.data);
+      } catch (err) {
+        console.error("Messages fetch error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMessages();
+  }, []);
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 transition-colors duration-300">
+      <div className="flex justify-between items-center mb-6 border-b border-gray-100 dark:border-gray-700 pb-4">
+        <h2 className="text-xl font-bold text-ngo-dark dark:text-white font-heading">
+          ✉️ Contact Inquiries
+        </h2>
+        <span className="text-sm font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 px-3 py-1 rounded-full">
+          {messages.length} Messages
+        </span>
+      </div>
+
+      {loading ? (
+        <p className="text-gray-500 dark:text-gray-400 text-center p-4">Loading messages...</p>
+      ) : messages.length === 0 ? (
+        <p className="text-gray-500 dark:text-gray-400 text-center p-4">No messages yet.</p>
+      ) : (
+        <div className="space-y-4">
+          {messages.map((m) => (
+            <div
+              key={m._id}
+              className="border border-gray-100 dark:border-gray-700 rounded-lg p-5 shadow-sm bg-gray-50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 transition-colors"
+            >
+              <div className="flex flex-col md:flex-row justify-between md:items-center mb-3">
+                <div>
+                  <p className="font-bold text-lg text-gray-800 dark:text-gray-200">{m.name}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <span className="mr-3">📞 {m.phone}</span>
+                    <span>✉️ {m.email || 'N/A'}</span>
+                  </p>
+                </div>
+                <span className="inline-block mt-2 md:mt-0 px-3 py-1 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md text-xs font-semibold">
+                  {m.subject}
+                </span>
+              </div>
+              <div className="bg-white dark:bg-gray-800 p-4 rounded-md border border-gray-100 dark:border-gray-600 mt-3">
+                <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap text-sm leading-relaxed">
+                  {m.message}
+                </p>
+              </div>
+              <p className="text-xs text-gray-500 mt-3 text-right font-medium">
+                🕒 {new Date(m.createdAt).toLocaleString("en-IN")}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // --- MAIN DASHBOARD LAYOUT ---
 
 const AdminDashboard = () => {
@@ -900,6 +974,7 @@ const AdminDashboard = () => {
     setIsSidebarOpen(false);
   };
 
+  // ✅ Yahan maine "messages" wala tab add kar diya hai
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: "📊" },
     { id: "add", label: "Add Person", icon: "➕" },
@@ -908,12 +983,14 @@ const AdminDashboard = () => {
     { id: "volunteers", label: "Volunteers", icon: "🤝" },
     { id: "reports", label: "Reports", icon: "📢" },
     { id: "rescues", label: "Rescue Alerts", icon: "🚨" },
+    { id: "messages", label: "Inbox", icon: "✉️" },
   ];
 
   const handleLogout = () => {
     navigate("/admin");
   };
 
+  // ✅ Yahan render logic mein "messages" add kiya
   const renderContent = () => {
     switch (activeTab) {
       case "dashboard":
@@ -930,6 +1007,8 @@ const AdminDashboard = () => {
         return <Volunteers />;
       case "rescues":
         return <RescueRequests />;
+      case "messages":
+        return <ContactMessages />;
       default:
         return <DashboardOverview />;
     }
