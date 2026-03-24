@@ -60,7 +60,7 @@ const Donations = () => {
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-colors duration-300">
       <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-xl font-bold text-ngo-dark dark:text-white font-heading">Donations</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white font-heading">Donations</h2>
           <span className="text-sm text-gray-500 dark:text-gray-400 mt-1 block">Verify UTRs against your bank app</span>
         </div>
 
@@ -122,19 +122,19 @@ const Donations = () => {
                   <td className="p-4 flex justify-center items-center gap-2">
                     {viewMode === "pending" ? (
                       <>
-                        <button onClick={() => handleUpdateStatus(d._id, "Verified")} className="text-xs font-bold bg-green-100 text-green-700 px-3 py-1.5 rounded-md hover:bg-green-500 hover:text-white transition-all shadow-sm">
+                        <button onClick={() => handleUpdateStatus(d._id, "Verified")} className="text-xs font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 px-3 py-1.5 rounded-md hover:bg-green-500 hover:text-white dark:hover:bg-green-500 dark:hover:text-white transition-all shadow-sm">
                           ✅ Verify
                         </button>
-                        <button onClick={() => handleUpdateStatus(d._id, "Rejected")} className="text-xs font-bold bg-yellow-100 text-yellow-700 px-3 py-1.5 rounded-md hover:bg-yellow-500 hover:text-white transition-all shadow-sm">
+                        <button onClick={() => handleUpdateStatus(d._id, "Rejected")} className="text-xs font-bold bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 px-3 py-1.5 rounded-md hover:bg-yellow-500 hover:text-white dark:hover:bg-yellow-500 dark:hover:text-white transition-all shadow-sm">
                           ❌ Reject
                         </button>
                       </>
                     ) : (
-                      <span className={`text-xs font-bold uppercase px-3 py-1.5 rounded-md ${d.status === "Verified" ? "bg-green-50 text-green-600" : "bg-yellow-50 text-yellow-600"}`}>
+                      <span className={`text-xs font-bold uppercase px-3 py-1.5 rounded-md ${d.status === "Verified" ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400" : "bg-yellow-50 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400"}`}>
                         {d.status}
                       </span>
                     )}
-                    <button onClick={() => handleDelete(d._id)} className="text-xs font-bold bg-red-50 text-red-500 px-3 py-1.5 rounded-md hover:bg-red-500 hover:text-white transition-all shadow-sm">
+                    <button onClick={() => handleDelete(d._id)} className="text-xs font-bold bg-red-50 text-red-500 dark:bg-red-900/30 dark:text-red-400 px-3 py-1.5 rounded-md hover:bg-red-500 hover:text-white dark:hover:bg-red-500 dark:hover:text-white transition-all shadow-sm">
                       Delete
                     </button>
                   </td>

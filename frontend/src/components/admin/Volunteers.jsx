@@ -54,7 +54,7 @@ const Volunteers = () => {
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-colors duration-300">
       <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-xl font-bold text-ngo-dark dark:text-white font-heading">Volunteers</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white font-heading">Volunteers</h2>
           <span className="text-sm text-gray-500 dark:text-gray-400 mt-1 block">Manage incoming help requests</span>
         </div>
         
@@ -105,7 +105,7 @@ const Volunteers = () => {
                     {v.status !== "Resolved" ? (
                       <button 
                         onClick={() => handleResolve(v._id)}
-                        className="text-xs font-bold uppercase bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 px-3 py-1.5 rounded-md hover:bg-blue-500 hover:text-white transition-all shadow-sm"
+                        className="text-xs font-bold uppercase bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 px-3 py-1.5 rounded-md hover:bg-blue-500 hover:text-white dark:hover:bg-blue-500 dark:hover:text-white transition-all shadow-sm"
                       >
                         ✅ Resolve
                       </button>
@@ -114,7 +114,7 @@ const Volunteers = () => {
                         Resolved
                       </span>
                     )}
-                    <button onClick={() => handleDelete(v._id)} className="text-xs font-bold bg-red-50 text-red-500 px-3 py-1.5 rounded-md hover:bg-red-500 hover:text-white transition-all shadow-sm">
+                    <button onClick={() => handleDelete(v._id)} className="text-xs font-bold bg-red-50 text-red-500 dark:bg-red-900/30 dark:text-red-400 px-3 py-1.5 rounded-md hover:bg-red-500 hover:text-white dark:hover:bg-red-500 dark:hover:text-white transition-all shadow-sm">
                       Delete
                     </button>
                   </td>

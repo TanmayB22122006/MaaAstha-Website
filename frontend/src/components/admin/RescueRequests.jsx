@@ -71,7 +71,7 @@ const RescueRequests = () => {
           <button
             onClick={() => setViewMode("resolved")}
             className={`px-4 py-1.5 text-sm font-semibold rounded-md transition-all ${
-              viewMode === "resolved" ? "bg-white dark:bg-gray-600 text-gray-800 dark:text-gray-200 shadow-sm" : "text-gray-500 dark:text-gray-400"
+              viewMode === "resolved" ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm" : "text-gray-500 dark:text-gray-400"
             }`}
           >
             Past Alerts
@@ -113,23 +113,23 @@ const RescueRequests = () => {
                     {viewMode === "active" ? (
                       <>
                         {r.status !== "In Progress" && (
-                          <button onClick={() => handleUpdateStatus(r._id, "In Progress")} className="text-xs font-bold bg-yellow-100 text-yellow-700 px-3 py-1.5 rounded-md hover:bg-yellow-500 hover:text-white transition-all shadow-sm">
+                          <button onClick={() => handleUpdateStatus(r._id, "In Progress")} className="text-xs font-bold bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 px-3 py-1.5 rounded-md hover:bg-yellow-500 hover:text-white dark:hover:bg-yellow-500 dark:hover:text-white transition-all shadow-sm">
                             ⏳ Progress
                           </button>
                         )}
-                        <button onClick={() => handleUpdateStatus(r._id, "Rescued")} className="text-xs font-bold bg-green-100 text-green-700 px-3 py-1.5 rounded-md hover:bg-green-500 hover:text-white transition-all shadow-sm">
+                        <button onClick={() => handleUpdateStatus(r._id, "Rescued")} className="text-xs font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 px-3 py-1.5 rounded-md hover:bg-green-500 hover:text-white dark:hover:bg-green-500 dark:hover:text-white transition-all shadow-sm">
                           ✅ Rescued
                         </button>
-                        <button onClick={() => handleUpdateStatus(r._id, "Invalid")} className="text-xs font-bold bg-gray-100 text-gray-600 px-3 py-1.5 rounded-md hover:bg-gray-500 hover:text-white transition-all shadow-sm">
+                        <button onClick={() => handleUpdateStatus(r._id, "Invalid")} className="text-xs font-bold bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-md hover:bg-gray-500 hover:text-white dark:hover:bg-gray-600 dark:hover:text-white transition-all shadow-sm">
                           ❌ Invalid
                         </button>
                       </>
                     ) : (
-                      <span className={`text-xs font-bold uppercase px-3 py-1.5 rounded-md ${r.status === "Rescued" ? "bg-green-50 text-green-600" : "bg-gray-100 text-gray-600"}`}>
+                      <span className={`text-xs font-bold uppercase px-3 py-1.5 rounded-md ${r.status === "Rescued" ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400" : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"}`}>
                         {r.status}
                       </span>
                     )}
-                    <button onClick={() => handleDelete(r._id)} className="text-xs font-bold bg-red-50 text-red-500 px-3 py-1.5 rounded-md hover:bg-red-500 hover:text-white transition-all shadow-sm">
+                    <button onClick={() => handleDelete(r._id)} className="text-xs font-bold bg-red-50 text-red-500 dark:bg-red-900/30 dark:text-red-400 px-3 py-1.5 rounded-md hover:bg-red-500 hover:text-white dark:hover:bg-red-500 dark:hover:text-white transition-all shadow-sm">
                       Delete
                     </button>
                   </td>
