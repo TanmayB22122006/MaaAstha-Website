@@ -41,7 +41,7 @@ const Events = () => {
               <div key={evt._id} className="bg-white dark:bg-gray-800 rounded-2xl shadow-md overflow-hidden border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 flex flex-col group">
                 <div className="relative h-64 overflow-hidden">
                   <img
-                    src={`http://localhost:5000${evt.imageUrl}`}
+                    src={evt.imageUrl.startsWith("http") ? evt.imageUrl : `http://localhost:5000${evt.imageUrl}`}
                     alt={evt.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     onError={(e) => { e.target.src = "https://via.placeholder.com/400x300?text=Event+Photo"; }}

@@ -13,7 +13,7 @@ const addMissingPerson = async (req, res) => {
       return res.status(400).json({ success: false, message: "Missing required fields." });
     }
 
-    const imageUrl = req.file ? `/uploads/${req.file.filename}` : "";
+    const imageUrl = req.file ? req.file.path : "";
 
     const newPerson = await MissingPerson.create({
       name,

@@ -30,8 +30,8 @@ const addPerson = async (req, res) => {
     const personData = { ...req.body };
 
     if (req.file) {
-      personData.imageUrl = `/uploads/${req.file.filename}`;
-      personData.image = `/uploads/${req.file.filename}`;
+      personData.imageUrl = req.file.path;
+      personData.image = req.file.path;
     }
 
     const newPerson = new Person(personData);

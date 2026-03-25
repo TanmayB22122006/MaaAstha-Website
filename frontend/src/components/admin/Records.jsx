@@ -57,7 +57,7 @@ const Records = () => {
             status: "Reunited",
             reunionDetails: reunionForm,
           }),
-        },
+        }
       );
       if (response.ok) {
         alert("Reunion details logged securely!");
@@ -82,7 +82,7 @@ const Records = () => {
   const handleDelete = async (id) => {
     if (
       window.confirm(
-        "Bhai, pakka delete karna hai? Data hamesha ke liye chala jayega.",
+        "Bhai, pakka delete karna hai? Data hamesha ke liye chala jayega."
       )
     ) {
       try {
@@ -259,7 +259,6 @@ const Records = () => {
               </h3>
               <button onClick={() => setReunionModal(null)} className="text-slate-500 hover:text-rose-500 text-2xl leading-none">&times;</button>
             </div>
-            {/* Modal Form Content ... (Keeping your exact previous modal form code here) */}
              <form onSubmit={handleReunionSubmit} className="p-6 space-y-4">
               <div className="bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400 p-3 rounded-lg text-sm border border-yellow-200 dark:border-yellow-700/50 mb-4">
                 <strong>Attention:</strong> Log receiver details carefully. This is a crucial legal & security requirement.
@@ -298,8 +297,7 @@ const Records = () => {
       {selectedPerson && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
           <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col border border-slate-200 dark:border-slate-800">
-             {/* ... keeping exact previous selected person modal ... */}
-             <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/80">
+            <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/80">
               <h3 className="text-xl font-bold font-heading text-indigo-600 dark:text-indigo-400">Record Details</h3>
               <button onClick={() => setSelectedPerson(null)} className="text-slate-500 hover:text-rose-500 text-2xl leading-none">&times;</button>
             </div>
@@ -308,7 +306,12 @@ const Records = () => {
                   <div className="w-full md:w-1/3 flex flex-col items-center gap-4">
                      <div className="w-48 h-48 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center">
                         {selectedPerson.imageUrl || selectedPerson.image ? (
-                           <img src={`http://localhost:5000${selectedPerson.imageUrl || selectedPerson.image}`} alt="Profile" className="w-full h-full object-cover" onError={(e) => { e.target.style.display = "none"; e.target.nextSibling.style.display = "block"; }}/>
+                           <img 
+                             src={(selectedPerson.imageUrl || selectedPerson.image).startsWith("http") ? (selectedPerson.imageUrl || selectedPerson.image) : `http://localhost:5000${selectedPerson.imageUrl || selectedPerson.image}`} 
+                             alt="Profile" 
+                             className="w-full h-full object-cover" 
+                             onError={(e) => { e.target.style.display = "none"; e.target.nextSibling.style.display = "block"; }}
+                           />
                         ) : null}
                         <span className="text-slate-400 text-sm px-4 text-center block" style={{ display: selectedPerson.imageUrl || selectedPerson.image ? "none" : "block" }}>No Photo</span>
                      </div>
@@ -326,7 +329,33 @@ const Records = () => {
                            <div className="col-span-2"><p className="text-slate-500">Location Found</p><p className="font-semibold text-slate-900 dark:text-white">{selectedPerson.address || selectedPerson.location || "N/A"}</p></div>
                         </div>
                      </div>
-                     {/* other details */}
+                     <div>
+                        <h4 className="text-xs font-bold text-indigo-500 dark:text-indigo-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800 pb-2 mb-3">Admission Details</h4>
+                        <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
+                           <div><p className="text-slate-500">Brought By</p><p className="font-semibold text-slate-900 dark:text-white">{selectedPerson.broughtBy || "N/A"}</p></div>
+                           <div>
+                             <p className="text-slate-500">Arrival Date</p>
+                             <p className="font-semibold text-slate-900 dark:text-white">
+                               {selectedPerson.arrivalDateTime ? new Date(selectedPerson.arrivalDateTime).toLocaleString() : "N/A"}
+                             </p>
+                           </div>
+                           <div className="col-span-2"><p className="text-slate-500">Reason</p><p className="font-semibold text-slate-900 dark:text-white">{selectedPerson.reason || "N/A"}</p></div>
+                           <div className="col-span-2"><p className="text-slate-500">Condition / Description</p><p className="font-semibold text-slate-900 dark:text-white">{selectedPerson.condition || selectedPerson.description || "N/A"}</p></div>
+                        </div>
+                     </div>
+                     {selectedPerson.status === "Reunited" && selectedPerson.reunionDetails && (
+                       <div className="bg-emerald-50 dark:bg-emerald-900/10 p-4 rounded-xl border border-emerald-100 dark:border-emerald-800/30">
+                         <h4 className="text-xs font-bold text-emerald-700 uppercase tracking-wider border-b border-emerald-200 dark:border-emerald-800 pb-2 mb-3">🤝 Reunion Details (Security Log)</h4>
+                         <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
+                           <div><p className="text-slate-500">Date of Leaving</p><p className="font-semibold text-slate-900 dark:text-white">{new Date(selectedPerson.reunionDetails.dateOfLeaving).toLocaleString()}</p></div>
+                           <div><p className="text-slate-500">Receiver Name</p><p className="font-semibold text-slate-900 dark:text-white">{selectedPerson.reunionDetails.receiverName}</p></div>
+                           <div><p className="text-slate-500">Relationship</p><p className="font-semibold text-slate-900 dark:text-white">{selectedPerson.reunionDetails.receiverRelation}</p></div>
+                           <div><p className="text-slate-500">Contact No.</p><p className="font-semibold text-slate-900 dark:text-white">{selectedPerson.reunionDetails.receiverContact}</p></div>
+                           <div className="col-span-2"><p className="text-slate-500">Receiver ID Proof</p><p className="font-semibold text-slate-900 dark:text-white">{selectedPerson.reunionDetails.receiverIdProof}</p></div>
+                           <div className="col-span-2"><p className="text-slate-500">Permanent Address</p><p className="font-semibold text-slate-900 dark:text-white">{selectedPerson.reunionDetails.receiverAddress}</p></div>
+                         </div>
+                       </div>
+                     )}
                   </div>
                </div>
             </div>

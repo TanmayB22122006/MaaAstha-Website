@@ -97,7 +97,11 @@ const ManageEvents = () => {
               events.map((evt) => (
                 <div key={evt._id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm flex flex-col">
                   <div className="h-40 bg-slate-200 dark:bg-slate-800 relative">
-                    <img src={`http://localhost:5000${evt.imageUrl}`} alt={evt.title} className="w-full h-full object-cover" />
+                    <img 
+                      src={evt.imageUrl.startsWith("http") ? evt.imageUrl : `http://localhost:5000${evt.imageUrl}`} 
+                      alt={evt.title} 
+                      className="w-full h-full object-cover" 
+                    />
                     <div className="absolute top-2 right-2 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm text-indigo-700 dark:text-indigo-400 text-xs font-bold px-2 py-1 rounded shadow">
                       {new Date(evt.date).toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric' })}
                     </div>

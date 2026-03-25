@@ -8,7 +8,7 @@ const addEvent = async (req, res) => {
       return res.status(400).json({ success: false, message: "Please fill all fields" });
     }
 
-    const imageUrl = req.file ? `/uploads/${req.file.filename}` : "";
+    const imageUrl = req.file ? req.file.path : "";
     
     if (!imageUrl) {
       return res.status(400).json({ success: false, message: "Event photo is mandatory" });
