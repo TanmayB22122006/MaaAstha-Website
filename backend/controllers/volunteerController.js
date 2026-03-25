@@ -11,11 +11,11 @@ const getVolunteers = async (req, res) => {
 
 const addVolunteer = async (req, res) => {
   try {
-    const { name, phone, helpText } = req.body;
-    if (!name || !phone || !helpText) {
+    const { name, idProof, age, designation, address, email, phone, helpType, availableDate, message } = req.body;
+    if (!name || !phone || !idProof || !age || !helpType) {
       return res.status(400).json({ success: false, message: "Missing fields" });
     }
-    const volunteer = await Volunteer.create({ name, phone, helpText });
+    const volunteer = await Volunteer.create({ name, idProof, age, designation, address, email, phone, helpType, availableDate, message });
     res.status(201).json({ success: true, data: volunteer });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server Error" });

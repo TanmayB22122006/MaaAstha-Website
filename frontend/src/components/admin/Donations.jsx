@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { CheckCircle, XCircle, Trash2 } from "lucide-react";
+import { CheckCircle, XCircle, TrendingUp, DollarSign } from "lucide-react";
 
 const Donations = () => {
   const [donations, setDonations] = useState([]);
@@ -12,108 +12,222 @@ const Donations = () => {
       const res = await fetch("http://localhost:5000/api/donations/all");
       const json = await res.json();
       if (json.success) setDonations(json.data);
-    } catch (e) { console.error("Failed to load donations", e); } 
-    finally { setLoading(false); }
+    } catch (e) {
+      console.error("Failed to load donations", e);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  useEffect(() => { loadDonations(); }, []);
+  useEffect(() => {
+    loadDonations();
+  }, []);
+
+  // --- Donation Stats Calculation Logic ---
+  const calculateStats = () => {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    let monthlyTotal = 0;
+    let yearlyTotal = 0;
+
+    donations.forEach((d) => {
+      if (d.status === "Verified") {
+        const dDate = new Date(d.createdAt || Date.now()); // Fallback agar date na ho
+        const dAmount = parseFloat(d.amount) || 0;
+
+        // Yearly Calculation
+        if (dDate.getFullYear() === currentYear) {
+          yearlyTotal += dAmount;
+          // Monthly Calculation
+          if (dDate.getMonth() === currentMonth) {
+            monthlyTotal += dAmount;
+          }
+        }
+      }
+    });
+
+    return { monthlyTotal, yearlyTotal };
+  };
+
+  const { monthlyTotal, yearlyTotal } = calculateStats();
 
   const handleUpdateStatus = async (id, newStatus) => {
-    if (!window.confirm(`Are you sure you want to mark this as ${newStatus}?`)) return;
+    if (!window.confirm(`Are you sure you want to mark this as ${newStatus}?`))
+      return;
     try {
-      const res = await fetch(`http://localhost:5000/api/donations/update/${id}`, {
-        method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: newStatus }),
-      });
+      const res = await fetch(
+        `http://localhost:5000/api/donations/update/${id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: newStatus }),
+        },
+      );
       if (res.ok) loadDonations();
-    } catch (e) { alert("Failed to update status"); }
+    } catch (e) {
+      alert("Failed to update status");
+    }
   };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm("Bhai, pakka delete karna hai? Yeh wapas nahi aayega.")) return;
-    try {
-      const res = await fetch(`http://localhost:5000/api/donations/delete/${id}`, { method: "DELETE" });
-      if (res.ok) loadDonations();
-    } catch (e) { alert("Delete failed!"); }
-  };
-
-  const filteredDonations = donations.filter((d) => {
-    const currentStatus = d.status || "Pending";
-    return viewMode === "pending" ? currentStatus === "Pending" : currentStatus !== "Pending";
-  });
-
-  const totalVerifiedAmount = donations.filter((d) => d.status === "Verified").reduce((sum, d) => sum + d.amount, 0);
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden transition-colors duration-300">
-       <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h2 className="text-xl font-bold text-indigo-600 dark:text-indigo-400 font-heading">Donations</h2>
-          <span className="text-sm text-slate-500 dark:text-slate-400 mt-1 block">Verify UTRs against your bank app</span>
+    <div className="space-y-6">
+      {/* --- Khatarnak Stats Cards --- */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-gradient-to-br from-emerald-500 to-teal-600 p-6 rounded-2xl shadow-lg shadow-emerald-200 dark:shadow-none text-white relative overflow-hidden">
+          <TrendingUp className="absolute right-[-10px] bottom-[-10px] size-24 opacity-20" />
+          <p className="text-emerald-100 font-bold uppercase text-[11px] tracking-wider">
+            This Month's Collection
+          </p>
+          <h2 className="text-3xl font-black mt-1">
+            ₹{monthlyTotal.toLocaleString("en-IN")}
+          </h2>
         </div>
-        <div className="flex flex-col items-end gap-3">
-          <div className="bg-emerald-50 dark:bg-emerald-900/20 px-4 py-2 rounded-lg border border-emerald-100 dark:border-emerald-800/30 text-right">
-            <p className="text-xs text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider">Total Verified Funds</p>
-            <p className="text-xl font-bold text-emerald-700 dark:text-emerald-300">₹{totalVerifiedAmount.toLocaleString("en-IN")}</p>
-          </div>
-          <div className="flex gap-2 bg-slate-100 dark:bg-slate-800/50 p-1 rounded-lg w-fit">
-            <button onClick={() => setViewMode("pending")} className={`px-4 py-1.5 text-sm font-semibold rounded-md transition-all ${viewMode === "pending" ? "bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 shadow-sm" : "text-slate-500 dark:text-slate-400"}`}>Pending Verification</button>
-            <button onClick={() => setViewMode("history")} className={`px-4 py-1.5 text-sm font-semibold rounded-md transition-all ${viewMode === "history" ? "bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500 dark:text-slate-400"}`}>Verified / Rejected</button>
-          </div>
+
+        <div className="bg-gradient-to-br from-indigo-500 to-blue-600 p-6 rounded-2xl shadow-lg shadow-indigo-200 dark:shadow-none text-white relative overflow-hidden">
+          <DollarSign className="absolute right-[-10px] bottom-[-10px] size-24 opacity-20" />
+          <p className="text-indigo-100 font-bold uppercase text-[11px] tracking-wider">
+            Annual Total ({new Date().getFullYear()})
+          </p>
+          <h2 className="text-3xl font-black mt-1">
+            ₹{yearlyTotal.toLocaleString("en-IN")}
+          </h2>
         </div>
       </div>
 
-      <div className="overflow-x-auto min-h-[300px]">
-        <table className="w-full text-left border-collapse min-w-[900px]">
-          <thead>
-            <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs tracking-wider border-b dark:border-slate-800">
-              <th className="p-4 font-bold uppercase">Donor Info</th>
-              <th className="p-4 font-bold uppercase">Amount</th>
-              <th className="p-4 font-bold uppercase">Ref / UTR ID</th>
-              <th className="p-4 font-bold uppercase">Date</th>
-              <th className="p-4 font-bold uppercase text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
-            {loading ? (
-              <tr><td colSpan="5" className="p-8 text-center text-slate-500">Loading...</td></tr>
-            ) : filteredDonations.length === 0 ? (
-              <tr><td colSpan="5" className="p-8 text-center text-slate-500">No records found.</td></tr>
-            ) : (
-              filteredDonations.map((d) => (
-                <tr key={d._id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4">
-                    <div className="font-medium text-slate-800 dark:text-slate-200">{d.name}</div>
-                    <div className="text-xs text-slate-500 mt-1">{d.phone} | {d.email || "No Email"}</div>
-                  </td>
-                  <td className="p-4 font-bold text-emerald-600 dark:text-emerald-400">₹{d.amount}</td>
-                  <td className="p-4">
-                    <span className="font-mono text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-xs border border-slate-200 dark:border-slate-700">{d.referenceId || "N/A"}</span>
-                  </td>
-                  <td className="p-4 text-slate-500 dark:text-slate-400 text-sm">{new Date(d.createdAt).toLocaleDateString("en-IN")}</td>
-                  <td className="p-4 flex justify-center items-center gap-2">
-                    {viewMode === "pending" ? (
-                      <>
-                        <button onClick={() => handleUpdateStatus(d._id, "Verified")} className="flex items-center gap-1.5 text-xs font-bold uppercase px-3 py-1.5 rounded-lg transition-all shadow-sm bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-600 hover:text-white dark:bg-emerald-900/40 dark:text-emerald-400 dark:border-emerald-800/50 dark:hover:bg-emerald-600 dark:hover:text-white dark:hover:border-transparent">
-                          <CheckCircle size={14} strokeWidth={2.5} /> Verify
-                        </button>
-                        <button onClick={() => handleUpdateStatus(d._id, "Rejected")} className="flex items-center gap-1.5 text-xs font-bold uppercase px-3 py-1.5 rounded-lg transition-all shadow-sm bg-amber-50 text-amber-600 border border-amber-100 hover:bg-amber-600 hover:text-white dark:bg-amber-900/40 dark:text-amber-400 dark:border-amber-800/50 dark:hover:bg-amber-600 dark:hover:text-white dark:hover:border-transparent">
-                          <XCircle size={14} strokeWidth={2.5} /> Reject
-                        </button>
-                      </>
-                    ) : (
-                      <span className={`text-xs font-bold uppercase px-3 py-1.5 rounded-lg border ${d.status === "Verified" ? "bg-emerald-50/50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" : "bg-amber-50/50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20"}`}>
+      {/* --- Original Table Content --- */}
+      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors duration-300">
+        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h3 className="text-lg font-bold text-slate-800 dark:text-white">
+              Donation Records
+            </h3>
+            <p className="text-sm text-slate-500">
+              Track and verify all incoming contributions.
+            </p>
+          </div>
+          <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl w-fit">
+            <button
+              onClick={() => setViewMode("pending")}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                viewMode === "pending"
+                  ? "bg-white dark:bg-slate-700 shadow text-indigo-600 dark:text-indigo-400"
+                  : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+              }`}
+            >
+              Pending
+            </button>
+            <button
+              onClick={() => setViewMode("all")}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                viewMode === "all"
+                  ? "bg-white dark:bg-slate-700 shadow text-indigo-600 dark:text-indigo-400"
+                  : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+              }`}
+            >
+              All History
+            </button>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse bg-white dark:bg-slate-900">
+            <thead>
+              <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 text-[11px] uppercase tracking-wider text-slate-400 font-bold">
+                <th className="px-6 py-4">Donor Details</th>
+                <th className="px-6 py-4">Amount</th>
+                <th className="px-6 py-4">Transaction Info</th>
+                <th className="px-6 py-4">Status</th>
+                <th className="px-6 py-4 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
+              {donations
+                .filter((d) => viewMode === "all" || d.status === "Pending")
+                .map((d) => (
+                  <tr
+                    key={d._id}
+                    className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group"
+                  >
+                    <td className="px-6 py-4">
+                      <div className="font-bold text-slate-700 dark:text-slate-200 text-sm">
+                        {d.name}
+                      </div>
+                      <div className="text-xs text-slate-500 mt-0.5 font-medium">
+                        {d.phone}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="font-black text-emerald-600 dark:text-emerald-400 text-base">
+                        ₹{d.amount}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded w-fit text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                        ID: {d.transactionId}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full border shadow-sm ${
+                          d.status === "Verified"
+                            ? "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20"
+                            : d.status === "Rejected"
+                              ? "bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20"
+                              : "bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20"
+                        }`}
+                      >
                         {d.status}
                       </span>
-                    )}
-                    <button onClick={() => handleDelete(d._id)} className="flex items-center gap-1.5 text-xs font-bold uppercase px-3 py-1.5 rounded-lg transition-all shadow-sm bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-600 hover:text-white dark:bg-rose-900/40 dark:text-rose-400 dark:border-rose-800/50 dark:hover:bg-rose-600 dark:hover:text-white dark:hover:border-transparent">
-                      <Trash2 size={14} strokeWidth={2.5} /> Delete
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex justify-center items-center gap-2">
+                        {d.status === "Pending" ? (
+                          <>
+                            <button
+                              onClick={() =>
+                                handleUpdateStatus(d._id, "Verified")
+                              }
+                              className="flex items-center gap-1.5 text-xs font-bold uppercase px-3 py-1.5 rounded-lg transition-all shadow-sm bg-indigo-50 text-indigo-600 border border-indigo-100 hover:bg-indigo-600 hover:text-white dark:bg-indigo-900/40 dark:text-indigo-400 dark:border-indigo-800/50 dark:hover:bg-indigo-600 dark:hover:text-white dark:hover:border-transparent"
+                            >
+                              <CheckCircle size={14} strokeWidth={2.5} /> Verify
+                            </button>
+                            <button
+                              onClick={() =>
+                                handleUpdateStatus(d._id, "Rejected")
+                              }
+                              className="flex items-center gap-1.5 text-xs font-bold uppercase px-3 py-1.5 rounded-lg transition-all shadow-sm bg-amber-50 text-amber-600 border border-amber-100 hover:bg-amber-600 hover:text-white dark:bg-amber-900/40 dark:text-indigo-400 dark:border-amber-800/50 dark:hover:bg-amber-600 dark:hover:text-white dark:hover:border-transparent"
+                            >
+                              <XCircle size={14} strokeWidth={2.5} /> Reject
+                            </button>
+                          </>
+                        ) : (
+                          <span
+                            className={`text-xs font-bold uppercase px-3 py-1.5 rounded-lg border ${
+                              d.status === "Verified"
+                                ? "bg-emerald-50/50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20"
+                                : "bg-amber-50/50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20"
+                            }`}
+                          >
+                            {d.status}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+
+        {donations.length === 0 && !loading && (
+          <div className="p-12 text-center">
+            <p className="text-slate-400 font-medium italic">
+              No donations found.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

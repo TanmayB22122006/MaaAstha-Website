@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Eye, Handshake, Trash2, Search, RefreshCw } from "lucide-react";
+import { Eye, Handshake, Search, RefreshCw } from "lucide-react";
 
 const Records = () => {
   const [records, setRecords] = useState([]);
@@ -41,7 +41,7 @@ const Records = () => {
     const start = new Date(arrival);
     const end = leaving ? new Date(leaving) : new Date();
     const diffTime = Math.abs(end - start);
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + " Days";
   };
 
   const handleReunionSubmit = async (e) => {
@@ -53,286 +53,369 @@ const Records = () => {
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            status: "Reunited",
-            reunionDetails: reunionForm,
-          }),
+          body: JSON.stringify({ ...reunionForm, status: "Reunited" }),
         },
       );
       if (response.ok) {
-        alert("Reunion details logged securely!");
         setReunionModal(null);
-        setReunionForm({
-          dateOfLeaving: "",
-          receiverName: "",
-          receiverRelation: "",
-          receiverContact: "",
-          receiverIdProof: "",
-          receiverAddress: "",
-        });
         fetchRecords();
+        alert("Status updated to Reunited!");
       }
     } catch (error) {
-      alert("Failed to save reunion details.");
+      alert("Error updating record");
     } finally {
       setIsUpdating(false);
     }
   };
 
-  const handleDelete = async (id) => {
-    if (
-      window.confirm(
-        "Bhai, pakka delete karna hai? Data hamesha ke liye chala jayega.",
-      )
-    ) {
-      try {
-        await fetch(`http://localhost:5000/api/persons/delete/${id}`, {
-          method: "DELETE",
-        });
-        fetchRecords();
-      } catch (error) {
-        alert("Delete failed!");
-      }
-    }
-  };
+  // handleDelete function yahan se hata diya gaya hai
 
-  const filteredRecords = records.filter((record) => {
-    if (viewMode === "current" && record.status === "Reunited") return false;
-    if (viewMode === "reunited" && record.status !== "Reunited") return false;
-
-    const searchLower = searchTerm.toLowerCase();
-    const name = record.fullName || record.name || "";
-    const loc = record.address || record.location || "";
-    return (
-      name.toLowerCase().includes(searchLower) ||
-      loc.toLowerCase().includes(searchLower)
-    );
+  const filteredRecords = records.filter((person) => {
+    const matchesSearch =
+      person.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      person.name?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesView =
+      viewMode === "current"
+        ? person.status !== "Reunited"
+        : person.status === "Reunited";
+    return matchesSearch && matchesView;
   });
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden font-sans transition-colors duration-300 relative">
-      <div className="p-6 border-b border-slate-100 dark:border-slate-800 space-y-4">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h2 className="text-xl font-bold text-indigo-600 dark:text-indigo-400 font-heading">
-              Shelter Records
-            </h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Manage and view resident database securely
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3 w-full md:w-auto">
-            <div className="relative w-full md:w-64">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                <Search size={16} />
-              </span>
-              <input
-                type="text"
-                placeholder="Search name, location..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-              />
-            </div>
-            <button
-              onClick={fetchRecords}
-              className="p-2.5 text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-all active:scale-95"
-            >
-              <RefreshCw size={16} className={isLoading ? "animate-spin" : ""} />
-            </button>
-          </div>
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+        <div className="relative flex-1 max-w-md">
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+            size={18}
+          />
+          <input
+            type="text"
+            placeholder="Search by name..."
+            className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border-none rounded-lg focus:ring-2 ring-indigo-500/20 dark:text-white transition-all outline-none text-sm"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
 
-        <div className="flex flex-wrap gap-2 bg-slate-100 dark:bg-slate-800/50 p-1 rounded-lg w-fit">
+        <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl w-fit border border-slate-200 dark:border-slate-700">
           <button
             onClick={() => setViewMode("current")}
-            className={`px-4 py-1.5 text-sm font-semibold rounded-md transition-all ${
+            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
               viewMode === "current"
-                ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm"
-                : "text-slate-500 dark:text-slate-400"
+                ? "bg-white dark:bg-slate-700 shadow text-indigo-600 dark:text-indigo-400"
+                : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
             }`}
           >
             Currently in Shelter
           </button>
           <button
             onClick={() => setViewMode("reunited")}
-            className={`px-4 py-1.5 text-sm font-semibold rounded-md transition-all ${
+            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
               viewMode === "reunited"
-                ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm"
-                : "text-slate-500 dark:text-slate-400"
+                ? "bg-white dark:bg-slate-700 shadow text-indigo-600 dark:text-indigo-400"
+                : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
             }`}
           >
-            Reunited
+            Reunited Cases
           </button>
-          <button
-            onClick={() => setViewMode("all")}
-            className={`px-4 py-1.5 text-sm font-semibold rounded-md transition-all ${
-              viewMode === "all"
-                ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm"
-                : "text-slate-500 dark:text-slate-400"
-            }`}
-          >
-            All-Time History
-          </button>
+        </div>
+
+        <button
+          onClick={fetchRecords}
+          className="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+          title="Refresh"
+        >
+          <RefreshCw size={20} className={isLoading ? "animate-spin" : ""} />
+        </button>
+      </div>
+
+      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-slate-50 dark:bg-slate-800/50 text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold border-b dark:border-slate-800">
+                <th className="px-6 py-4">Ref. ID</th>
+                <th className="px-6 py-4">Full Name</th>
+                <th className="px-6 py-4">Age / Gender</th>
+                <th className="px-6 py-4">Stay Duration</th>
+                <th className="px-6 py-4">Current Status</th>
+                <th className="px-6 py-4 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
+              {isLoading ? (
+                <tr>
+                  <td
+                    colSpan="6"
+                    className="p-12 text-center text-slate-400 italic"
+                  >
+                    Loading records...
+                  </td>
+                </tr>
+              ) : filteredRecords.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan="6"
+                    className="p-12 text-center text-slate-400 italic"
+                  >
+                    No records found matching your search.
+                  </td>
+                </tr>
+              ) : (
+                filteredRecords.map((person) => (
+                  <tr
+                    key={person._id}
+                    className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group"
+                  >
+                    <td className="px-6 py-4 text-xs font-mono text-slate-400 uppercase tracking-tighter">
+                      #{person._id.slice(-6)}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="font-bold text-slate-700 dark:text-slate-200 text-sm">
+                        {person.fullName || person.name || "Unknown"}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-slate-500">
+                      {person.age || "N/A"} • {person.gender || "N/A"}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-slate-500">
+                      {calculateDays(
+                        person.dateOfArrival,
+                        person.dateOfLeaving,
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full border shadow-sm ${
+                          person.status === "Reunited"
+                            ? "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400"
+                            : "bg-indigo-50 text-indigo-600 border-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400"
+                        }`}
+                      >
+                        {person.status || "In Shelter"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex justify-center items-center gap-2">
+                        <button
+                          onClick={() => setSelectedPerson(person)}
+                          className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
+                          title="View Profile"
+                        >
+                          <Eye size={18} />
+                        </button>
+
+                        {person.status !== "Reunited" && (
+                          <button
+                            onClick={() => setReunionModal(person)}
+                            className="flex items-center gap-1.5 text-[10px] font-black uppercase px-3 py-1.5 rounded-lg transition-all shadow-sm bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-600 hover:text-white dark:bg-emerald-900/40 dark:text-emerald-400 dark:border-emerald-800/50 dark:hover:bg-emerald-600 dark:hover:text-white"
+                          >
+                            <Handshake size={14} /> Reunited
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <div className="overflow-x-auto min-h-[400px]">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs tracking-wider border-b dark:border-slate-800">
-              <th className="p-4 font-bold uppercase">Name</th>
-              <th className="p-4 font-bold uppercase">Status</th>
-              <th className="p-4 font-bold uppercase">Date Added</th>
-              <th className="p-4 font-bold uppercase text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
-            {isLoading && records.length === 0 ? (
-              <tr>
-                <td colSpan="4" className="p-10 text-center text-slate-500 dark:text-slate-400">Loading database...</td>
-              </tr>
-            ) : filteredRecords.length === 0 ? (
-              <tr>
-                <td colSpan="4" className="p-10 text-center text-slate-500 dark:text-slate-400">No records found.</td>
-              </tr>
-            ) : (
-              filteredRecords.map((record) => (
-                <tr key={record._id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
-                  <td className="p-4">
-                    <div className="font-medium text-slate-800 dark:text-slate-200">
-                      {record.fullName || record.name}
+      {/* Profile Detail Modal */}
+      {selectedPerson && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
+            <div className="flex flex-col md:flex-row h-full max-h-[90vh] overflow-y-auto">
+              <div className="md:w-1/3 bg-slate-100 dark:bg-slate-800/50 p-8 flex flex-col items-center text-center border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800">
+                <div className="w-40 h-40 rounded-3xl bg-white dark:bg-slate-700 shadow-xl overflow-hidden mb-6 border-4 border-white dark:border-slate-600 ring-4 ring-indigo-500/10">
+                  {selectedPerson.imageUrl ? (
+                    <img
+                      src={`http://localhost:5000${selectedPerson.imageUrl}`}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-slate-300">
+                      No Photo
                     </div>
-                    <div className="text-xs text-slate-500 dark:text-slate-500 mt-1">
-                      {record.address || record.location}
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wide ${
-                        record.status === "Reunited"
-                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20"
-                          : "bg-indigo-100 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20"
-                      }`}
-                    >
-                      {record.status}
-                    </span>
-                  </td>
-                  <td className="p-4 text-slate-500 dark:text-slate-400 text-sm">
-                    {record.arrivalDateTime ? new Date(record.arrivalDateTime).toLocaleDateString("en-IN") : "N/A"}
-                  </td>
-                  <td className="p-4 flex justify-center gap-2">
-                    <button
-                      onClick={() => setSelectedPerson(record)}
-                      className="flex items-center gap-1.5 text-xs font-bold uppercase px-3 py-1.5 rounded-lg transition-all shadow-sm bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-600 hover:text-white dark:bg-blue-900/40 dark:text-blue-400 dark:border-blue-800/50 dark:hover:bg-blue-600 dark:hover:text-white dark:hover:border-transparent"
-                    >
-                      <Eye size={14} strokeWidth={2.5} /> View
-                    </button>
-                    {record.status !== "Reunited" && (
-                      <button
-                        onClick={() => setReunionModal(record)}
-                        className="flex items-center gap-1.5 text-xs font-bold uppercase px-3 py-1.5 rounded-lg transition-all shadow-sm bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-600 hover:text-white dark:bg-emerald-900/40 dark:text-emerald-400 dark:border-emerald-800/50 dark:hover:bg-emerald-600 dark:hover:text-white dark:hover:border-transparent"
-                      >
-                        <Handshake size={14} strokeWidth={2.5} /> Reunite
-                      </button>
-                    )}
-                    <button
-                      onClick={() => handleDelete(record._id)}
-                      className="flex items-center gap-1.5 text-xs font-bold uppercase px-3 py-1.5 rounded-lg transition-all shadow-sm bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-600 hover:text-white dark:bg-rose-900/40 dark:text-rose-400 dark:border-rose-800/50 dark:hover:bg-rose-600 dark:hover:text-white dark:hover:border-transparent"
-                    >
-                      <Trash2 size={14} strokeWidth={2.5} /> Delete
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+                  )}
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-1">
+                  {selectedPerson.fullName || selectedPerson.name}
+                </h3>
+                <span className="text-xs font-black uppercase tracking-widest text-indigo-500 bg-indigo-50 dark:bg-indigo-900/40 px-3 py-1 rounded-full">
+                  Ref ID: #{selectedPerson._id.slice(-6)}
+                </span>
+              </div>
 
-      {reunionModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
-            <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-emerald-50 dark:bg-emerald-900/20">
-              <h3 className="text-xl font-bold font-heading text-emerald-700 dark:text-emerald-400">
-                Reunion Security Form
-              </h3>
-              <button onClick={() => setReunionModal(null)} className="text-slate-500 hover:text-rose-500 text-2xl leading-none">&times;</button>
+              <div className="flex-1 p-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-6">
+                    <div>
+                      <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800 pb-2 mb-3">
+                        Personal Information
+                      </h4>
+                      <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
+                        <div>
+                          <p className="text-slate-500">Full Name</p>
+                          <p className="font-semibold text-slate-900 dark:text-white">
+                            {selectedPerson.fullName ||
+                              selectedPerson.name ||
+                              "N/A"}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-slate-500">Age & Gender</p>
+                          <p className="font-semibold text-slate-900 dark:text-white">
+                            {selectedPerson.age || "N/A"} •{" "}
+                            {selectedPerson.gender || "N/A"}
+                          </p>
+                        </div>
+                        <div className="col-span-2">
+                          <p className="text-slate-500">Location Found</p>
+                          <p className="font-semibold text-slate-900 dark:text-white">
+                            {selectedPerson.address ||
+                              selectedPerson.location ||
+                              "N/A"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            {/* Modal Form Content ... (Keeping your exact previous modal form code here) */}
-             <form onSubmit={handleReunionSubmit} className="p-6 space-y-4">
-              <div className="bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400 p-3 rounded-lg text-sm border border-yellow-200 dark:border-yellow-700/50 mb-4">
-                <strong>Attention:</strong> Log receiver details carefully. This is a crucial legal & security requirement.
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Date of Leaving *</label>
-                  <input required type="datetime-local" className="w-full p-2.5 border rounded-lg bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none" value={reunionForm.dateOfLeaving} onChange={(e) => setReunionForm({...reunionForm, dateOfLeaving: e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Receiver Name *</label>
-                  <input required type="text" placeholder="Who is taking them?" className="w-full p-2.5 border rounded-lg bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none" value={reunionForm.receiverName} onChange={(e) => setReunionForm({...reunionForm, receiverName: e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Relationship *</label>
-                  <input required type="text" placeholder="e.g., Brother, Son, NGO" className="w-full p-2.5 border rounded-lg bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none" value={reunionForm.receiverRelation} onChange={(e) => setReunionForm({...reunionForm, receiverRelation: e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Receiver Contact No. *</label>
-                  <input required type="text" placeholder="Active mobile number" className="w-full p-2.5 border rounded-lg bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none" value={reunionForm.receiverContact} onChange={(e) => setReunionForm({...reunionForm, receiverContact: e.target.value})} />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Receiver Permanent Address *</label>
-                  <textarea required rows="2" placeholder="Full residential address" className="w-full p-2.5 border rounded-lg bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none resize-none" value={reunionForm.receiverAddress} onChange={(e) => setReunionForm({...reunionForm, receiverAddress: e.target.value})}></textarea>
-                </div>
-              </div>
-              <div className="flex justify-end gap-3 mt-4">
-                <button type="button" onClick={() => setReunionModal(null)} className="px-5 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white rounded-lg font-medium">Cancel</button>
-                <button type="submit" disabled={isUpdating} className="px-5 py-2 bg-emerald-600 text-white rounded-lg font-bold shadow-md disabled:opacity-50">{isUpdating ? "Logging..." : "Confirm Reunion"}</button>
-              </div>
-            </form>
+            <div className="p-4 bg-slate-50 dark:bg-slate-800/80 border-t border-slate-100 dark:border-slate-800 text-right">
+              <button
+                onClick={() => setSelectedPerson(null)}
+                className="px-6 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white rounded-lg font-medium hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
+              >
+                Close Window
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      {selectedPerson && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col border border-slate-200 dark:border-slate-800">
-             {/* ... keeping exact previous selected person modal ... */}
-             <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/80">
-              <h3 className="text-xl font-bold font-heading text-indigo-600 dark:text-indigo-400">Record Details</h3>
-              <button onClick={() => setSelectedPerson(null)} className="text-slate-500 hover:text-rose-500 text-2xl leading-none">&times;</button>
+      {/* Reunited Update Modal */}
+      {reunionModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-xl rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div className="p-6 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="text-lg font-bold text-slate-800 dark:text-white">
+                Reunion Details - {reunionModal.fullName || reunionModal.name}
+              </h3>
+              <p className="text-xs text-slate-500 mt-1">
+                Please fill in the details of the receiver for legal records.
+              </p>
             </div>
-            <div className="p-6 overflow-y-auto">
-               <div className="flex flex-col md:flex-row gap-8">
-                  <div className="w-full md:w-1/3 flex flex-col items-center gap-4">
-                     <div className="w-48 h-48 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center">
-                        {selectedPerson.imageUrl || selectedPerson.image ? (
-                           <img src={`http://localhost:5000${selectedPerson.imageUrl || selectedPerson.image}`} alt="Profile" className="w-full h-full object-cover" onError={(e) => { e.target.style.display = "none"; e.target.nextSibling.style.display = "block"; }}/>
-                        ) : null}
-                        <span className="text-slate-400 text-sm px-4 text-center block" style={{ display: selectedPerson.imageUrl || selectedPerson.image ? "none" : "block" }}>No Photo</span>
-                     </div>
-                     <div className="text-center w-full">
-                        <span className={`px-4 py-1.5 block rounded-md text-sm font-bold tracking-wide mb-2 ${selectedPerson.status === "Reunited" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400" : "bg-indigo-100 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400"}`}>Status: {selectedPerson.status}</span>
-                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full block">Days in Shelter: {calculateDays(selectedPerson.arrivalDateTime, selectedPerson.reunionDetails?.dateOfLeaving)}</span>
-                     </div>
-                  </div>
-                  <div className="w-full md:w-2/3 space-y-6">
-                     <div>
-                        <h4 className="text-xs font-bold text-indigo-500 dark:text-indigo-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800 pb-2 mb-3">Personal Information</h4>
-                        <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
-                           <div><p className="text-slate-500">Full Name</p><p className="font-semibold text-slate-900 dark:text-white">{selectedPerson.fullName || selectedPerson.name || "N/A"}</p></div>
-                           <div><p className="text-slate-500">Age & Gender</p><p className="font-semibold text-slate-900 dark:text-white">{selectedPerson.age || "N/A"} • {selectedPerson.gender || "N/A"}</p></div>
-                           <div className="col-span-2"><p className="text-slate-500">Location Found</p><p className="font-semibold text-slate-900 dark:text-white">{selectedPerson.address || selectedPerson.location || "N/A"}</p></div>
-                        </div>
-                     </div>
-                     {/* other details */}
-                  </div>
-               </div>
-            </div>
-            <div className="p-4 bg-slate-50 dark:bg-slate-800/80 border-t border-slate-100 dark:border-slate-800 text-right">
-              <button onClick={() => setSelectedPerson(null)} className="px-6 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white rounded-lg font-medium hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">Close Window</button>
-            </div>
+            <form onSubmit={handleReunionSubmit} className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">
+                    Date of Departure
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    className="w-full p-2.5 rounded-lg border dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 ring-indigo-500/20 text-sm"
+                    onChange={(e) =>
+                      setReunionForm({
+                        ...reunionForm,
+                        dateOfLeaving: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">
+                    Receiver Full Name
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Who is receiving?"
+                    className="w-full p-2.5 rounded-lg border dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 ring-indigo-500/20 text-sm"
+                    onChange={(e) =>
+                      setReunionForm({
+                        ...reunionForm,
+                        receiverName: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">
+                    Relation with Person
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Parent, Friend"
+                    className="w-full p-2.5 rounded-lg border dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 ring-indigo-500/20 text-sm"
+                    onChange={(e) =>
+                      setReunionForm({
+                        ...reunionForm,
+                        receiverRelation: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">
+                    Contact Number
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="Active mobile number"
+                    className="w-full p-2.5 rounded-lg border dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 ring-indigo-500/20 text-sm"
+                    onChange={(e) =>
+                      setReunionForm({
+                        ...reunionForm,
+                        receiverContact: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">
+                  ID Proof Detail
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Aadhar Card Number / DL Number"
+                  className="w-full p-2.5 rounded-lg border dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 ring-indigo-500/20 text-sm"
+                  onChange={(e) =>
+                    setReunionForm({
+                      ...reunionForm,
+                      receiverIdProof: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setReunionModal(null)}
+                  className="flex-1 py-3 text-sm font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isUpdating}
+                  className="flex-1 py-3 text-sm font-bold text-white bg-emerald-600 rounded-xl shadow-lg shadow-emerald-200 dark:shadow-none hover:bg-emerald-700 transition-all disabled:opacity-50"
+                >
+                  {isUpdating ? "Processing..." : "Confirm Reunion"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
