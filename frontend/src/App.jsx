@@ -1,9 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-
 import Home from "./pages/Home";
 import About from "./pages/About";
 import MissingPeople from "./pages/MissingPeople";
@@ -14,17 +12,16 @@ import Login from "./pages/Login";
 import Volunteer from "./pages/Volunteer";
 import AdminDashboard from "./pages/AdminDashboard";
 import ReportForm from "./pages/ReportForm";
-import Events from "./pages/Events"; // <-- NAYA IMPORT
+import Events from "./pages/Events";
 
 const AppContent = () => {
   const location = useLocation();
-  const isAdminRoute = location.pathname === "/admin-dashboard";
+  const isAdminRoute = location.pathname.startsWith("/admin-dashboard") || location.pathname === "/admin";
 
   return (
     <>
       {!isAdminRoute && <Navbar />}
-
-      <div className={`${!isAdminRoute ? "pt-20" : ""} min-h-screen flex flex-col font-sans bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300`}>
+      <div className={`${!isAdminRoute ? "pt-24" : ""} min-h-screen flex flex-col font-sans bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300`}>
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
@@ -37,10 +34,9 @@ const AppContent = () => {
             <Route path="/volunteer" element={<Volunteer />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/report-missing" element={<ReportForm />} />
-            <Route path="/events" element={<Events />} /> {/* <-- NAYA ROUTE */}
+            <Route path="/events" element={<Events />} />
           </Routes>
         </main>
-
         {!isAdminRoute && <Footer />}
       </div>
     </>
