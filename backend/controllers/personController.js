@@ -3,19 +3,31 @@ const Person = require("../models/Person");
 // 1. Add Person logic
 const addPerson = async (req, res) => {
   try {
-    const { fullName, age, gender, address, arrivalDateTime, broughtBy, reason } = req.body;
+    const { uid, fullName, age, gender, address, arrivalDateTime, broughtBy, reason } = req.body;
+
     if (!fullName || !age || !gender || !address || !arrivalDateTime || !broughtBy || !reason) {
       return res.status(400).json({ success: false, message: "Please fill all required fields!" });
     }
+
+    // Check for Duplicate UID if provided
+    if (uid) {
+      const existingPerson = await Person.findOne({ uid });
+      if (existingPerson) {
+        return res.status(400).json({ success: false, message: "This Unique ID (UID) already exists!" });
+      }
+    }
+
     const personData = { ...req.body };
     if (req.file) {
       personData.imageUrl = req.file.path;
       personData.image = req.file.path;
     }
+
     const newPerson = new Person(personData);
     await newPerson.save();
     res.status(201).json({ success: true, message: "Record saved successfully!", data: newPerson });
   } catch (error) {
+    console.error("Add Person Error:", error);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
@@ -50,7 +62,7 @@ const deletePerson = async (req, res) => {
   }
 };
 
-// 5. Dashboard Stats logic (UPDATED with Self Exited)
+// 5. Dashboard Stats logic
 const getDashboardStats = async (req, res) => {
   try {
     const totalSheltered = await Person.countDocuments({ status: "Sheltered" });
