@@ -3,10 +3,14 @@
 @variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-ngo-dark: #2d372c;
-  --color-ngo-green: #5c7a5d;
-  --color-ngo-light: #758a74;
-  --color-ngo-red: #e11d48;
+  /* Premium Emerald Green Palette */
+  --color-ngo-dark: #064e3b;   /* Deep Emerald (Footer/Headers ke liye) */
+  --color-ngo-green: #059669;  /* Main Emerald Green (Buttons/Highlights) */
+  --color-ngo-light: #d1fae5;  /* Very Light Green (Background sections) */
+  --color-ngo-red: #dc2626;    /* Emergency Red */
+  
+  /* Neutral Shades */
+  --color-ngo-base: #f8fafc;   /* Premium Off-White Body Background */
 
   --font-sans: "Inter", sans-serif;
   --font-heading: "Poppins", sans-serif;
@@ -14,13 +18,15 @@
 
 body {
   font-family: var(--font-sans);
+  background-color: var(--color-ngo-base); /* Poori website ka base color badal diya */
+  color: #1e293b; /* Dark Slate text for better reading */
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
+}
+
+/* Smooth Transition for Theme Toggling */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }

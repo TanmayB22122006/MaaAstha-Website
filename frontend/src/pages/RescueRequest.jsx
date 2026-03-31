@@ -25,7 +25,7 @@ const RescueRequest = () => {
   const getLocation = () => {
     if (!navigator.geolocation) {
       alert(
-        "Your browser does not support GPS. Please type the location manually.",
+        "Your browser does not support GPS. / तुमच्या ब्राउझरमध्ये GPS सपोर्ट नाही.",
       );
       return;
     }
@@ -41,230 +41,114 @@ const RescueRequest = () => {
         setFormData((prev) => ({
           ...prev,
           gpsLocation: `GPS Pin: ${mapLink}`,
-          gpsUrl: mapLink, // Save raw link
+          gpsUrl: mapLink,
         }));
         setGpsStatus("success");
       },
       (error) => {
-        alert(
-          "Failed to get location. Please enable GPS permissions or type the location manually.",
-        );
-        setGpsStatus("idle");
+        setGpsStatus("error");
+        alert("Unable to fetch location. / स्थान मिळवण्यात अक्षम.");
       },
     );
   };
 
-  const removeGps = () => {
-    setFormData((prev) => ({ ...prev, gpsLocation: "" }));
-    setGpsStatus("idle");
+  const handleFileChange = (e) => {
+    setFormData({ ...formData, photo: e.target.files[0] });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!formData.manualLocation.trim() && !formData.gpsLocation) {
-      alert(
-        "Please provide either a manual location description or attach your GPS location.",
-      );
-      return;
-    }
-
     setLoading(true);
+
+    const data = new FormData();
+    Object.keys(formData).forEach((key) => {
+      data.append(key, formData[key]);
+    });
+
     try {
-      let finalLocation = "";
-      if (formData.manualLocation && formData.gpsLocation) {
-        finalLocation = `${formData.gpsLocation}\nLandmark/Details: ${formData.manualLocation}`;
-      } else if (formData.gpsLocation) {
-        finalLocation = formData.gpsLocation;
-      } else {
-        finalLocation = formData.manualLocation;
-      }
-
-      const submitData = new FormData();
-      submitData.append("location", finalLocation);
-      submitData.append("condition", formData.condition);
-      submitData.append("reporterName", formData.reporterName);
-      submitData.append("reporterPhone", formData.reporterPhone);
-      if (formData.photo) {
-        submitData.append("image", formData.photo);
-      }
-
-      const res = await fetch("http://localhost:5000/api/rescue-requests/add", {
+      const response = await fetch("http://localhost:5000/api/rescue/add", {
         method: "POST",
-        body: submitData,
+        body: data,
       });
-      const data = await res.json();
 
-      if (data.success) {
-        alert("Rescue alert sent successfully! Help is on the way.");
+      const resJson = await response.json();
+      if (resJson.success) {
+        alert("Rescue request sent! / बचाव विनंती पाठवली गेली!");
         setFormData({
           manualLocation: "",
           gpsLocation: "",
+          gpsUrl: "",
           condition: "",
           reporterName: "",
           reporterPhone: "",
           photo: null,
         });
         setGpsStatus("idle");
-        document.getElementById("photo-upload").value = "";
-      } else {
-        alert(data.message || "Failed to send alert.");
       }
-    } catch (error) {
-      alert("Server error. Please try again or call the emergency number.");
+    } catch (err) {
+      alert("Error sending request. / विनंती पाठवताना त्रुटी आली.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="pt-24 pb-20 px-4 font-sans bg-slate-50 dark:bg-slate-900 min-h-screen transition-colors duration-300">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12 animate-fadeInUp">
-          <div className="inline-flex items-center gap-2 bg-rose-100 text-rose-600 px-4 py-1.5 rounded-full text-sm font-bold tracking-wider mb-6 shadow-sm border border-rose-200">
-            <AlertTriangle size={16} /> EMERGENCY RESPONSE
-          </div>
-          <h1 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-6 tracking-tight">
-            Request a Rescue
-          </h1>
-          <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed">
-            If you see a homeless, injured, or mentally challenged person on the
-            streets who needs immediate assistance, please fill out this form.
-          </p>
-        </div>
+    <div className="pt-32 pb-20 min-h-screen bg-slate-50 dark:bg-slate-950 relative overflow-hidden">
+      {/* Soft Blur Background */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-rose-200/20 dark:bg-rose-900/10 rounded-full blur-[120px]"></div>
+      </div>
 
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
-          <div className="lg:w-1/3 space-y-6">
-            <div className="bg-rose-600 text-white p-8 rounded-3xl shadow-xl shadow-rose-900/20 text-center relative overflow-hidden">
-              <div className="absolute top-0 right-0 -mr-4 -mt-4 opacity-20">
-                <Phone size={100} />
-              </div>
-              <h2 className="text-2xl font-black mb-2 relative z-10">
-                Need Urgent Help?
-              </h2>
-              <p className="text-rose-100 mb-6 relative z-10">
-                No time to fill the form? Call us directly:
-              </p>
-              <div className="bg-white text-rose-600 text-3xl font-mono font-black py-4 rounded-2xl shadow-inner relative z-10">
-                +91 98765 43210
-              </div>
-              <p className="mt-4 text-sm font-medium relative z-10 text-rose-100">
-                Available 24/7 in Navi Mumbai
-              </p>
+      <div className="container mx-auto px-6 max-w-4xl relative z-10">
+        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-[3rem] shadow-2xl border border-white dark:border-slate-800 overflow-hidden">
+          {/* Header */}
+          <div className="bg-rose-600 p-8 text-center text-white">
+            <div className="inline-flex p-3 bg-white/20 rounded-2xl mb-4 animate-pulse">
+              <AlertTriangle size={32} />
             </div>
-
-            <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 transition-colors duration-300">
-              <h3 className="font-bold text-slate-900 dark:text-white text-lg mb-6 flex items-center gap-2 border-b border-slate-100 dark:border-slate-700 pb-4">
-                <Info className="text-indigo-500" /> Rescue Guidelines
-              </h3>
-              <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-300">
-                <li className="flex items-start gap-3">
-                  <span className="text-emerald-500 mt-0.5">
-                    <CheckCircle2 size={16} />
-                  </span>
-                  <span>
-                    Provide the exact location or a recognizable landmark.
-                  </span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-emerald-500 mt-0.5">
-                    <CheckCircle2 size={16} />
-                  </span>
-                  <span>
-                    If possible, stay near the person until our team arrives.
-                  </span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-emerald-500 mt-0.5">
-                    <CheckCircle2 size={16} />
-                  </span>
-                  <span>
-                    Upload a photo from a safe distance to help us identify
-                    them.
-                  </span>
-                </li>
-                <li className="flex items-start gap-3 text-rose-600 dark:text-rose-400 font-semibold bg-rose-50 dark:bg-rose-900/20 p-3 rounded-lg mt-2">
-                  <AlertTriangle size={16} className="shrink-0 mt-0.5" />
-                  <span>
-                    Please do not submit fake requests; a life might be at
-                    stake.
-                  </span>
-                </li>
-              </ul>
-            </div>
+            <h1 className="text-3xl md:text-5xl font-black tracking-tight mb-2">
+              Emergency Rescue
+            </h1>
+            <p className="text-rose-100 font-bold text-xl italic underline decoration-rose-300 underline-offset-4">
+              तात्काळ बचाव विनंती
+            </p>
           </div>
 
-          <div className="lg:w-2/3 bg-white dark:bg-slate-800 p-8 md:p-10 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700 transition-colors duration-300">
-            <form className="space-y-8" onSubmit={handleSubmit}>
+          <div className="p-8 md:p-12">
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Location Section */}
               <div className="space-y-4">
-                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-2">
-                  <label className="block text-base font-bold text-slate-900 dark:text-white">
-                    Where is the person?{" "}
-                    <span className="text-rose-500">*</span>
-                  </label>
-                  <span className="text-xs text-slate-500 font-medium bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded">
-                    Step 1 of 3
-                  </span>
-                </div>
+                <h3 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+                  <MapPin className="text-rose-600" /> Location Details /
+                  स्थानाचा तपशील
+                </h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="md:col-span-2">
-                    {gpsStatus === "success" ? (
-                      <div className="flex items-center justify-between bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/50 p-4 rounded-xl">
-                        <div className="flex items-center gap-3 text-emerald-700 dark:text-emerald-400">
-                          <MapPin size={20} className="animate-bounce" />
-                          <span className="font-bold">Location Attached</span>
-                          <a
-                            href={formData.gpsUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="ml-2 text-xs font-bold bg-white dark:bg-emerald-900 text-emerald-600 dark:text-emerald-300 px-3 py-1 rounded-md border border-emerald-200 dark:border-emerald-700 hover:bg-emerald-600 hover:text-white transition-colors"
-                          >
-                            View on Map
-                          </a>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={removeGps}
-                          className="text-sm font-semibold text-rose-500 hover:text-rose-700 transition-colors"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={getLocation}
-                        disabled={gpsStatus === "fetching"}
-                        className="w-full flex items-center justify-center gap-2 p-4 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50 rounded-xl font-bold transition-all disabled:opacity-70"
-                      >
-                        {gpsStatus === "fetching" ? (
-                          <>
-                            <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>{" "}
-                            Fetching GPS...
-                          </>
-                        ) : (
-                          <>
-                            <MapPin size={20} /> Use My Current GPS Location
-                          </>
-                        )}
-                      </button>
-                    )}
-                  </div>
+                <div className="grid grid-cols-1 gap-4">
+                  <button
+                    type="button"
+                    onClick={getLocation}
+                    className={`w-full py-4 rounded-2xl font-black transition-all flex items-center justify-center gap-3 border-2 ${
+                      gpsStatus === "success"
+                        ? "bg-emerald-50 border-emerald-500 text-emerald-700"
+                        : "bg-slate-900 text-white border-slate-900 hover:bg-slate-800"
+                    }`}
+                  >
+                    {gpsStatus === "fetching"
+                      ? "Getting Location..."
+                      : gpsStatus === "success"
+                        ? "Location Captured! / स्थान मिळाले!"
+                        : "Capture My GPS Location / माझे GPS स्थान मिळवा"}
+                    {gpsStatus === "success" && <CheckCircle2 size={20} />}
+                  </button>
 
-                  <div className="md:col-span-2 relative flex items-center py-2">
-                    <div className="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
-                    <span className="flex-shrink-0 mx-4 text-slate-400 text-sm font-medium">
-                      AND / OR
-                    </span>
-                    <div className="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
-                  </div>
-
-                  <div className="md:col-span-2">
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">
+                      Specific Landmarks / जवळपासच्या खुणा (Optional)
+                    </label>
                     <textarea
+                      name="manualLocation"
                       rows="2"
-                      className="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-colors resize-none placeholder:text-slate-400"
-                      placeholder="Type landmark or manual address here (e.g., Outside Kalyan Station Platform 1)"
+                      placeholder="e.g. Near Star Mall, under the flyover..."
                       value={formData.manualLocation}
                       onChange={(e) =>
                         setFormData({
@@ -272,114 +156,97 @@ const RescueRequest = () => {
                           manualLocation: e.target.value,
                         })
                       }
-                    ></textarea>
+                      className="w-full p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-rose-500 transition-all"
+                    />
                   </div>
                 </div>
               </div>
 
+              {/* Condition Section */}
               <div className="space-y-4">
-                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-2">
-                  <label className="block text-base font-bold text-slate-900 dark:text-white">
-                    Condition & Details <span className="text-rose-500">*</span>
-                  </label>
-                  <span className="text-xs text-slate-500 font-medium bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded">
-                    Step 2 of 3
-                  </span>
-                </div>
+                <h3 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+                  <Info className="text-rose-600" /> Person's Condition /
+                  व्यक्तीची स्थिती
+                </h3>
                 <textarea
                   required
-                  rows="3"
-                  className="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-colors resize-none placeholder:text-slate-400"
-                  placeholder="Describe what they are wearing, any visible injuries, apparent age, or state of mind."
+                  placeholder="Tell us about the person (Illness, age group, behavior)... / व्यक्तीबद्दल माहिती द्या (आजारपण, वय, वागणूक)..."
                   value={formData.condition}
                   onChange={(e) =>
                     setFormData({ ...formData, condition: e.target.value })
                   }
-                ></textarea>
-
-                <div className="mt-4">
-                  <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
-                    <Camera size={16} /> Upload Photo (Highly Recommended)
-                  </label>
-                  <input
-                    type="file"
-                    id="photo-upload"
-                    accept="image/*"
-                    className="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-slate-200 dark:file:bg-slate-700 file:text-slate-700 dark:file:text-slate-200 hover:file:bg-slate-300 transition-colors"
-                    onChange={(e) =>
-                      setFormData({ ...formData, photo: e.target.files[0] })
-                    }
-                  />
-                </div>
+                  className="w-full p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-rose-500 h-32 resize-none"
+                />
               </div>
 
+              {/* Photo Upload */}
               <div className="space-y-4">
-                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-2">
-                  <label className="block text-base font-bold text-slate-900 dark:text-white">
-                    Your Contact Info
-                  </label>
-                  <span className="text-xs text-slate-500 font-medium bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded">
-                    Step 3 of 3
-                  </span>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
-                      <User size={16} /> Name
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-rose-500 outline-none transition-colors placeholder:text-slate-400"
-                      placeholder="Optional"
-                      value={formData.reporterName}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          reporterName: e.target.value,
-                        })
-                      }
-                    />
+                <h3 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+                  <Camera className="text-rose-600" /> Upload Photo / फोटो अपलोड
+                  करा
+                </h3>
+                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-[2rem] cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <Camera className="w-8 h-8 text-slate-400 mb-2" />
+                    <p className="text-sm text-slate-500 font-bold">
+                      Click to capture or upload / फोटो निवडा
+                    </p>
                   </div>
-                  <div>
-                    <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
-                      <Phone size={16} /> Phone{" "}
-                      <span className="text-rose-500">*</span>
-                    </label>
-                    <input
-                      required
-                      type="tel"
-                      className="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-rose-500 outline-none transition-colors placeholder:text-slate-400"
-                      placeholder="For location verification"
-                      value={formData.reporterPhone}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          reporterPhone: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
+                </label>
+              </div>
+
+              {/* Reporter Info */}
+              <div className="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-[2rem] border border-slate-100 dark:border-slate-800">
+                <h3 className="text-lg font-black text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                  <User size={20} className="text-rose-600" /> Your Details /
+                  तुमचे तपशील
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input
+                    required
+                    placeholder="Your Name / तुमचे नाव"
+                    value={formData.reporterName}
+                    onChange={(e) =>
+                      setFormData({ ...formData, reporterName: e.target.value })
+                    }
+                    className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-rose-500"
+                  />
+                  <input
+                    required
+                    type="tel"
+                    placeholder="Your Phone / तुमचा फोन नंबर"
+                    value={formData.reporterPhone}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        reporterPhone: e.target.value,
+                      })
+                    }
+                    className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-rose-500"
+                  />
                 </div>
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-rose-600 text-white font-black text-lg py-4 rounded-xl hover:bg-rose-700 transition-all shadow-lg shadow-rose-900/20 mt-8 flex justify-center items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed transform hover:-translate-y-1"
+                className="w-full bg-rose-600 hover:bg-rose-700 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-rose-200 dark:shadow-none disabled:opacity-50 text-xl tracking-tight"
               >
-                {loading ? "Transmitting Alert..." : "SEND EMERGENCY ALERT"}
+                {loading
+                  ? "Sending Alert..."
+                  : "SEND EMERGENCY ALERT / तात्काळ अलर्ट पाठवा"}
               </button>
             </form>
           </div>
         </div>
       </div>
-      <style>{`
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fadeInUp { animation: fadeInUp 0.5s ease-out forwards; }
-      `}</style>
     </div>
   );
 };
