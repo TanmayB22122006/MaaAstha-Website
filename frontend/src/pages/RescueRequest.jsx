@@ -122,7 +122,7 @@ const RescueRequest = () => {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12 animate-fadeInUp">
           <div className="inline-flex items-center gap-2 bg-rose-100 text-rose-600 px-4 py-1.5 rounded-full text-sm font-bold tracking-wider mb-6 shadow-sm border border-rose-200">
-            <AlertTriangle size={16} /> EMERGENCY RESPONSE
+            <AlertTriangle size={16} /> EMERGENCY RESPONSE/ तात्काळ बचाव विनंती
           </div>
           <h1 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-6 tracking-tight">
             Request a Rescue
@@ -187,7 +187,7 @@ const RescueRequest = () => {
                   <AlertTriangle size={16} className="shrink-0 mt-0.5" />
                   <span>
                     Please do not submit fake requests; a life might be at
-                    stake.
+                    stake. 
                   </span>
                 </li>
               </ul>
@@ -199,7 +199,7 @@ const RescueRequest = () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-2">
                   <label className="block text-base font-bold text-slate-900 dark:text-white">
-                    Where is the person?{" "}
+                    Location Details / स्थानाचा तपशील{" "}
                     <span className="text-rose-500">*</span>
                   </label>
                   <span className="text-xs text-slate-500 font-medium bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded">
@@ -280,7 +280,7 @@ const RescueRequest = () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-2">
                   <label className="block text-base font-bold text-slate-900 dark:text-white">
-                    Condition & Details <span className="text-rose-500">*</span>
+                    Person's Condition / व्यक्तीची स्थिती <span className="text-rose-500">*</span>
                   </label>
                   <span className="text-xs text-slate-500 font-medium bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded">
                     Step 2 of 3
@@ -299,7 +299,7 @@ const RescueRequest = () => {
 
                 <div className="mt-4">
                   <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
-                    <Camera size={16} /> Upload Photo (Highly Recommended)
+                    <Camera size={16} /> Upload Photo / फोटो अपलोड करा (Highly Recommended)
                   </label>
                   <input
                     type="file"
@@ -316,7 +316,7 @@ const RescueRequest = () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-2">
                   <label className="block text-base font-bold text-slate-900 dark:text-white">
-                    Your Contact Info
+                    Your Details / तुमचे तपशील
                   </label>
                   <span className="text-xs text-slate-500 font-medium bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded">
                     Step 3 of 3
@@ -325,7 +325,7 @@ const RescueRequest = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
-                      <User size={16} /> Name
+                      <User size={16} /> Your Name / तुमचे नाव
                     </label>
                     <input
                       type="text"
@@ -342,7 +342,7 @@ const RescueRequest = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
-                      <Phone size={16} /> Phone{" "}
+                      <Phone size={16} /> Your Phone / तुमचा फोन नंबर{" "}
                       <span className="text-rose-500">*</span>
                     </label>
                     <input
