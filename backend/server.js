@@ -20,7 +20,7 @@ connectDB();
 const app = express();
 
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:3000", "https://maa-astha-website-n0p86t2hf-2024dhanarajmore-5931s-projects.vercel.app"], 
+  origin: ["http://localhost:5173", "http://localhost:3000", "https://maa-astha-website.vercel.app"], 
   credentials: true
 }));
 app.use(express.json());
