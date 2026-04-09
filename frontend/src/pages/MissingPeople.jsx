@@ -13,7 +13,7 @@ const MissingPeople = () => {
     const fetchMissingPersons = async () => {
       try {
         const response = await fetch(
-          "http://localhost:5000/api/missing-persons/all",
+          "https://maaastha-website.onrender.com/api/missing-persons/all",
         );
         const data = await response.json();
         if (data.success) {
