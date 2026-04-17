@@ -12,7 +12,7 @@ const MissingPersonCard = ({ person }) => {
           src={
             person.imageUrl?.startsWith("http")
               ? person.imageUrl
-              : `http://localhost:5000${person.imageUrl}`
+              : `https://maaastha-website-etur.onrender.com${person.imageUrl}`
           }
           alt={person.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

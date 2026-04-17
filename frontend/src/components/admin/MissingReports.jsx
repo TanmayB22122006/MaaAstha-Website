@@ -36,9 +36,12 @@ const MissingReports = () => {
     setLoadingClaims(true);
     try {
       const token = localStorage.getItem("adminToken");
-      const res = await fetch("http://localhost:5000/api/reports/all", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        "https://maaastha-website-etur.onrender.com/api/reports/all",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       const json = await res.json();
       if (json.success) setClaims(json.data);
     } catch (e) {
@@ -51,7 +54,9 @@ const MissingReports = () => {
   const loadCases = async () => {
     setLoadingCases(true);
     try {
-      const res = await fetch("http://localhost:5000/api/missing-persons/all");
+      const res = await fetch(
+        "https://maaastha-website-etur.onrender.com/api/missing-persons/all",
+      );
       const json = await res.json();
       if (json.success) setCases(json.data);
     } catch (e) {
@@ -71,7 +76,7 @@ const MissingReports = () => {
     try {
       const token = localStorage.getItem("adminToken");
       const res = await fetch(
-        `http://localhost:5000/api/reports/delete/${id}`,
+        `https://maaastha-website-etur.onrender.com/api/reports/delete/${id}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
@@ -93,7 +98,7 @@ const MissingReports = () => {
     try {
       const token = localStorage.getItem("adminToken");
       const res = await fetch(
-        `http://localhost:5000/api/missing-persons/delete/${id}`,
+        `https://maaastha-website-etur.onrender.com/api/missing-persons/delete/${id}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
@@ -131,7 +136,7 @@ const MissingReports = () => {
       }
 
       const response = await fetch(
-        "http://localhost:5000/api/missing-persons/add",
+        "https://maaastha-website-etur.onrender.com/api/missing-persons/add",
         {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
@@ -511,7 +516,7 @@ const MissingReports = () => {
                         src={
                           person.imageUrl?.startsWith("http")
                             ? person.imageUrl
-                            : `http://localhost:5000${person.imageUrl}`
+                            : `https://maaastha-website-etur.onrender.com${person.imageUrl}`
                         }
                         alt={person.fullName || person.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -529,24 +534,35 @@ const MissingReports = () => {
                         {person.fullName || person.name}
                       </h4>
                       <p className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-4">
-                        {person.age} Years {person.gender && person.gender !== "Select" ? `• ${person.gender}` : ""}
+                        {person.age} Years{" "}
+                        {person.gender && person.gender !== "Select"
+                          ? `• ${person.gender}`
+                          : ""}
                       </p>
 
                       <div className="space-y-2.5 mb-4">
                         <div className="flex items-start gap-2.5 text-xs text-slate-600 dark:text-slate-300">
-                          <div className="text-slate-400 mt-0.5"><MapPin size={14} /></div>
-                          <span className="font-medium leading-relaxed">{person.location}</span>
+                          <div className="text-slate-400 mt-0.5">
+                            <MapPin size={14} />
+                          </div>
+                          <span className="font-medium leading-relaxed">
+                            {person.location}
+                          </span>
                         </div>
                         <div className="flex items-center gap-2.5 text-xs text-slate-600 dark:text-slate-300">
-                          <div className="text-slate-400"><Calendar size={14} /></div>
+                          <div className="text-slate-400">
+                            <Calendar size={14} />
+                          </div>
                           <span className="font-medium">
                             {person.missingSince
-                              ? new Date(person.missingSince).toLocaleDateString("en-IN")
+                              ? new Date(
+                                  person.missingSince,
+                                ).toLocaleDateString("en-IN")
                               : "N/A"}
                           </span>
                         </div>
                       </div>
-                      
+
                       {/* 🔥 FIX: Ab description directly UI me dikhega */}
                       {(person.description || person.details) && (
                         <p className="text-[11px] text-slate-600 dark:text-slate-400 line-clamp-3 mb-4 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-100 dark:border-slate-800 italic leading-relaxed">
@@ -558,7 +574,8 @@ const MissingReports = () => {
                         onClick={() => handleDeleteCase(person._id)}
                         className="w-full flex justify-center items-center gap-2 text-rose-600 hover:text-white dark:text-rose-400 font-bold text-xs bg-rose-50 dark:bg-rose-900/20 hover:bg-rose-600 dark:hover:bg-rose-600 border border-rose-100 dark:border-rose-800/50 hover:border-transparent py-2.5 rounded-xl transition-colors mt-auto uppercase tracking-wide"
                       >
-                        <Trash2 size={14} strokeWidth={2.5}/> Mark Found / Delete
+                        <Trash2 size={14} strokeWidth={2.5} /> Mark Found /
+                        Delete
                       </button>
                     </div>
                   </div>

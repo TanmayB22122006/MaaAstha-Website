@@ -31,7 +31,7 @@ const DashboardOverview = () => {
       try {
         const token = localStorage.getItem("adminToken");
         const response = await fetch(
-          "http://localhost:5000/api/persons/stats",
+          "https://maaastha-website-etur.onrender.com/api/persons/stats",
           {
             headers: { Authorization: `Bearer ${token}` },
           },

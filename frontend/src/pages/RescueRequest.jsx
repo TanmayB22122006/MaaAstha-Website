@@ -89,10 +89,13 @@ const RescueRequest = () => {
         submitData.append("image", formData.photo);
       }
 
-      const res = await fetch("http://localhost:5000/api/rescue-requests/add", {
-        method: "POST",
-        body: submitData,
-      });
+      const res = await fetch(
+        "https://maaastha-website-etur.onrender.com/api/rescue-requests/add",
+        {
+          method: "POST",
+          body: submitData,
+        },
+      );
       const data = await res.json();
 
       if (data.success) {
@@ -187,7 +190,7 @@ const RescueRequest = () => {
                   <AlertTriangle size={16} className="shrink-0 mt-0.5" />
                   <span>
                     Please do not submit fake requests; a life might be at
-                    stake. 
+                    stake.
                   </span>
                 </li>
               </ul>
@@ -280,7 +283,8 @@ const RescueRequest = () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-2">
                   <label className="block text-base font-bold text-slate-900 dark:text-white">
-                    Person's Condition / व्यक्तीची स्थिती <span className="text-rose-500">*</span>
+                    Person's Condition / व्यक्तीची स्थिती{" "}
+                    <span className="text-rose-500">*</span>
                   </label>
                   <span className="text-xs text-slate-500 font-medium bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded">
                     Step 2 of 3
@@ -299,7 +303,8 @@ const RescueRequest = () => {
 
                 <div className="mt-4">
                   <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
-                    <Camera size={16} /> Upload Photo / फोटो अपलोड करा (Highly Recommended)
+                    <Camera size={16} /> Upload Photo / फोटो अपलोड करा (Highly
+                    Recommended)
                   </label>
                   <input
                     type="file"

@@ -50,9 +50,12 @@ const Records = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("adminToken");
-      const response = await fetch("http://localhost:5000/api/persons/all", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(
+        "https://maaastha-website-etur.onrender.com/api/persons/all",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       const data = await response.json();
       if (data.success) setRecords(data.data);
     } catch (error) {
@@ -92,7 +95,7 @@ const Records = () => {
     try {
       const token = localStorage.getItem("adminToken");
       const response = await fetch(
-        `http://localhost:5000/api/persons/update/${personId}`,
+        `https://maaastha-website-etur.onrender.com/api/persons/update/${personId}`,
         {
           method: "PATCH",
           headers: {
@@ -119,7 +122,7 @@ const Records = () => {
     try {
       const token = localStorage.getItem("adminToken");
       const response = await fetch(
-        `http://localhost:5000/api/persons/update/${reunionModal._id}`,
+        `https://maaastha-website-etur.onrender.com/api/persons/update/${reunionModal._id}`,
         {
           method: "PATCH",
           headers: {
@@ -181,7 +184,7 @@ const Records = () => {
       try {
         const token = localStorage.getItem("adminToken");
         const res = await fetch(
-          `http://localhost:5000/api/persons/delete/${id}`,
+          `https://maaastha-website-etur.onrender.com/api/persons/delete/${id}`,
           {
             method: "DELETE",
             headers: { Authorization: `Bearer ${token}` },
@@ -273,47 +276,105 @@ const Records = () => {
         {/* MOBILE VIEW (Cards) */}
         <div className="md:hidden space-y-4 px-2 mt-4">
           {isLoading && records.length === 0 ? (
-            <div className="p-10 text-center text-slate-500 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700">Loading database...</div>
+            <div className="p-10 text-center text-slate-500 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700">
+              Loading database...
+            </div>
           ) : filteredRecords.length === 0 ? (
-            <div className="p-10 text-center text-slate-500 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700">No records found.</div>
+            <div className="p-10 text-center text-slate-500 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700">
+              No records found.
+            </div>
           ) : (
             filteredRecords.map((record) => (
-              <div key={record._id} className="bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/50 p-4 rounded-2xl shadow-sm space-y-3">
+              <div
+                key={record._id}
+                className="bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/50 p-4 rounded-2xl shadow-sm space-y-3"
+              >
                 <div className="flex justify-between items-start">
                   <div>
-                    <div className="font-bold text-slate-900 dark:text-white text-lg">{record.fullName || record.name}</div>
+                    <div className="font-bold text-slate-900 dark:text-white text-lg">
+                      {record.fullName || record.name}
+                    </div>
                     <div className="text-xs font-medium text-slate-500 mt-1">
-                      {record.uid && <span className="font-bold text-indigo-600 dark:text-indigo-400 mr-2 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded">#{record.uid}</span>}
+                      {record.uid && (
+                        <span className="font-bold text-indigo-600 dark:text-indigo-400 mr-2 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded">
+                          #{record.uid}
+                        </span>
+                      )}
                     </div>
                   </div>
-                  <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border ${
-                      record.status === "Reunited" ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400" :
-                      record.status === "Escaped" ? "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-400" :
-                      record.status === "Dead" ? "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-400" :
-                      record.status === "Self Exited" ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400" :
-                      "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400"
-                    }`}>
-                      {record.status}
+                  <span
+                    className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border ${
+                      record.status === "Reunited"
+                        ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400"
+                        : record.status === "Escaped"
+                          ? "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-400"
+                          : record.status === "Dead"
+                            ? "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-400"
+                            : record.status === "Self Exited"
+                              ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400"
+                              : "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400"
+                    }`}
+                  >
+                    {record.status}
                   </span>
                 </div>
-                <div className="text-sm text-slate-600 dark:text-slate-400">{record.address || record.location}</div>
-                <div className="text-xs text-slate-500 dark:text-slate-500 border-b border-slate-100 dark:border-slate-700/50 pb-3">Added: {record.arrivalDateTime ? new Date(record.arrivalDateTime).toLocaleDateString("en-IN") : "N/A"}</div>
-                
+                <div className="text-sm text-slate-600 dark:text-slate-400">
+                  {record.address || record.location}
+                </div>
+                <div className="text-xs text-slate-500 dark:text-slate-500 border-b border-slate-100 dark:border-slate-700/50 pb-3">
+                  Added:{" "}
+                  {record.arrivalDateTime
+                    ? new Date(record.arrivalDateTime).toLocaleDateString(
+                        "en-IN",
+                      )
+                    : "N/A"}
+                </div>
+
                 {/* Mobile Actions */}
                 <div className="flex flex-col gap-2 pt-1">
-                  <button onClick={() => setSelectedPerson(record)} className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-100 hover:bg-indigo-600 hover:text-white dark:bg-indigo-900/40 dark:text-indigo-400 dark:border-indigo-800/50 transition-all text-xs font-bold">
+                  <button
+                    onClick={() => setSelectedPerson(record)}
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-100 hover:bg-indigo-600 hover:text-white dark:bg-indigo-900/40 dark:text-indigo-400 dark:border-indigo-800/50 transition-all text-xs font-bold"
+                  >
                     <Eye size={14} /> View Details
                   </button>
                   {record.status === "Sheltered" && (
                     <div className="grid grid-cols-2 gap-2">
-                       <button onClick={() => setReunionModal(record)} className="flex justify-center items-center gap-1.5 px-2 py-2 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 text-[11px] font-bold"><Handshake size={12} /> Reunite</button>
-                       <button onClick={() => setExitModal({ record, type: "Self Exited" })} className="flex justify-center items-center gap-1.5 px-2 py-2 rounded-lg bg-blue-50 text-blue-700 border border-blue-100 dark:bg-blue-900/30 dark:text-blue-400 text-[11px] font-bold"><LogOut size={12} /> Self Exit</button>
-                       <button onClick={() => setExitModal({ record, type: "Escaped" })} className="flex justify-center items-center gap-1.5 px-2 py-2 rounded-lg bg-orange-50 text-orange-700 border border-orange-100 dark:bg-orange-900/30 dark:text-orange-400 text-[11px] font-bold"><UserMinus size={12} /> Escaped</button>
-                       <button onClick={() => setFuneralModal(record)} className="flex justify-center items-center gap-1.5 px-2 py-2 rounded-lg bg-rose-50 text-rose-700 border border-rose-100 dark:bg-rose-900/30 dark:text-rose-400 text-[11px] font-bold"><HeartPulse size={12} /> Deceased</button>
+                      <button
+                        onClick={() => setReunionModal(record)}
+                        className="flex justify-center items-center gap-1.5 px-2 py-2 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 text-[11px] font-bold"
+                      >
+                        <Handshake size={12} /> Reunite
+                      </button>
+                      <button
+                        onClick={() =>
+                          setExitModal({ record, type: "Self Exited" })
+                        }
+                        className="flex justify-center items-center gap-1.5 px-2 py-2 rounded-lg bg-blue-50 text-blue-700 border border-blue-100 dark:bg-blue-900/30 dark:text-blue-400 text-[11px] font-bold"
+                      >
+                        <LogOut size={12} /> Self Exit
+                      </button>
+                      <button
+                        onClick={() =>
+                          setExitModal({ record, type: "Escaped" })
+                        }
+                        className="flex justify-center items-center gap-1.5 px-2 py-2 rounded-lg bg-orange-50 text-orange-700 border border-orange-100 dark:bg-orange-900/30 dark:text-orange-400 text-[11px] font-bold"
+                      >
+                        <UserMinus size={12} /> Escaped
+                      </button>
+                      <button
+                        onClick={() => setFuneralModal(record)}
+                        className="flex justify-center items-center gap-1.5 px-2 py-2 rounded-lg bg-rose-50 text-rose-700 border border-rose-100 dark:bg-rose-900/30 dark:text-rose-400 text-[11px] font-bold"
+                      >
+                        <HeartPulse size={12} /> Deceased
+                      </button>
                     </div>
                   )}
                   {adminRole === "superadmin" && (
-                    <button onClick={() => handleDelete(record._id)} className="w-full flex items-center justify-center gap-2 mt-1 px-3 py-2 rounded-lg bg-red-50 text-red-600 border border-red-100 dark:bg-red-900/30 dark:text-red-400 text-xs font-bold">
+                    <button
+                      onClick={() => handleDelete(record._id)}
+                      className="w-full flex items-center justify-center gap-2 mt-1 px-3 py-2 rounded-lg bg-red-50 text-red-600 border border-red-100 dark:bg-red-900/30 dark:text-red-400 text-xs font-bold"
+                    >
                       <Trash2 size={14} /> Delete Record
                     </button>
                   )}
@@ -802,7 +863,7 @@ const Records = () => {
                             selectedPerson.imageUrl || selectedPerson.image
                           ).startsWith("http")
                             ? selectedPerson.imageUrl || selectedPerson.image
-                            : `http://localhost:5000${selectedPerson.imageUrl || selectedPerson.image}`
+                            : `https://maaastha-website-etur.onrender.com${selectedPerson.imageUrl || selectedPerson.image}`
                         }
                         alt="Profile"
                         className="w-full h-full object-cover"

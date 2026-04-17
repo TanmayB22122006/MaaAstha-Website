@@ -21,7 +21,9 @@ const About = () => {
   useEffect(() => {
     const fetchStories = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/stories/all");
+        const res = await fetch(
+          "https://maaastha-website-etur.onrender.com/api/stories/all",
+        );
         const json = await res.json();
         if (json.success) setStories(json.data);
       } catch (error) {

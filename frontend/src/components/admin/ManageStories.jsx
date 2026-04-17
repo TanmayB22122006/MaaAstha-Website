@@ -20,7 +20,9 @@ const ManageStories = () => {
   const loadStories = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/stories/all");
+      const res = await fetch(
+        "https://maaastha-website-etur.onrender.com/api/stories/all",
+      );
       const json = await res.json();
       if (json.success) setStories(json.data);
     } catch (e) {
@@ -48,11 +50,14 @@ const ManageStories = () => {
       if (formData.afterImage)
         dataToSend.append("afterImage", formData.afterImage);
 
-      const res = await fetch("http://localhost:5000/api/stories/add", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: dataToSend,
-      });
+      const res = await fetch(
+        "https://maaastha-website-etur.onrender.com/api/stories/add",
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: dataToSend,
+        },
+      );
 
       const data = await res.json();
       if (data.success) {
@@ -81,7 +86,7 @@ const ManageStories = () => {
     try {
       const token = localStorage.getItem("adminToken");
       const res = await fetch(
-        `http://localhost:5000/api/stories/delete/${id}`,
+        `https://maaastha-website-etur.onrender.com/api/stories/delete/${id}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },

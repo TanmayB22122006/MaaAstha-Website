@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 const AddPerson = () => {
   const initialForm = {
-    uid: "", 
+    uid: "",
     fullName: "",
     age: "",
     gender: "Select",
@@ -31,16 +31,22 @@ const AddPerson = () => {
         }
       });
 
-      const response = await fetch("http://localhost:5000/api/persons/add", {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${token}` },
-        body: dataToSend,
-      });
+      const response = await fetch(
+        "https://maaastha-website-etur.onrender.com/api/persons/add",
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: dataToSend,
+        },
+      );
 
       const data = await response.json();
 
       if (data.success) {
-        alert("✅ Record saved successfully! " + (formData.uid ? `(UID: ${formData.uid})` : ""));
+        alert(
+          "✅ Record saved successfully! " +
+            (formData.uid ? `(UID: ${formData.uid})` : ""),
+        );
         setFormData(initialForm);
         document.getElementById("photo-upload").value = "";
       } else {
@@ -69,7 +75,6 @@ const AddPerson = () => {
           1. Personal Details
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-5 bg-gray-50 dark:bg-gray-700/30 p-4 rounded-lg border border-gray-100 dark:border-gray-700">
-          
           <div>
             <label className="block text-sm font-bold text-indigo-600 dark:text-indigo-400 mb-1">
               Unique ID (UID)
@@ -79,7 +84,9 @@ const AddPerson = () => {
               placeholder="e.g. MA-2024-001"
               className="w-full px-4 py-2 bg-white dark:bg-gray-700 border-2 border-indigo-100 dark:border-indigo-900 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
               value={formData.uid}
-              onChange={(e) => setFormData({ ...formData, uid: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, uid: e.target.value })
+              }
             />
           </div>
 
@@ -93,29 +100,41 @@ const AddPerson = () => {
               placeholder="Enter full name"
               className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-ngo-green outline-none"
               value={formData.fullName}
-              onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, fullName: e.target.value })
+              }
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Age (वय) *</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Age (वय) *
+            </label>
             <input
               type="number"
               required
               placeholder="Age"
               className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-ngo-green outline-none"
               value={formData.age}
-              onChange={(e) => setFormData({ ...formData, age: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, age: e.target.value })
+              }
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Gender (लिंग) *</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Gender (लिंग) *
+            </label>
             <select
               required
               className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-ngo-green outline-none"
               value={formData.gender}
-              onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, gender: e.target.value })
+              }
             >
-              <option value="Select" disabled>Select</option>
+              <option value="Select" disabled>
+                Select
+              </option>
               <option value="Male">Male (पुरुष)</option>
               <option value="Female">Female (स्त्री)</option>
               <option value="Other">Other</option>
@@ -128,34 +147,46 @@ const AddPerson = () => {
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 bg-gray-50 dark:bg-gray-700/30 p-4 rounded-lg border border-gray-100 dark:border-gray-700">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Address / Found At (पत्ता) *</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Address / Found At (पत्ता) *
+            </label>
             <input
               type="text"
               required
               placeholder="Last known address"
               className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-ngo-green outline-none"
               value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, address: e.target.value })
+              }
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Mobile No. (मोबाईल क्र.)</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Mobile No. (मोबाईल क्र.)
+            </label>
             <input
               type="tel"
               placeholder="If available"
               className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-ngo-green outline-none"
               value={formData.mobileNo}
-              onChange={(e) => setFormData({ ...formData, mobileNo: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, mobileNo: e.target.value })
+              }
             />
           </div>
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ID Document No.</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              ID Document No.
+            </label>
             <input
               type="text"
               placeholder="Aadhar, Voter ID, PAN"
               className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-ngo-green outline-none"
               value={formData.idDocument}
-              onChange={(e) => setFormData({ ...formData, idDocument: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, idDocument: e.target.value })
+              }
             />
           </div>
         </div>
@@ -165,54 +196,74 @@ const AddPerson = () => {
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 bg-gray-50 dark:bg-gray-700/30 p-4 rounded-lg border border-gray-100 dark:border-gray-700">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Arrival Date & Time *</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Arrival Date & Time *
+            </label>
             <input
               type="datetime-local"
               required
               className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-ngo-green outline-none"
               value={formData.arrivalDateTime}
-              onChange={(e) => setFormData({ ...formData, arrivalDateTime: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, arrivalDateTime: e.target.value })
+              }
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Brought By *</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Brought By *
+            </label>
             <input
               type="text"
               required
               placeholder="e.g., Police, NGO Team"
               className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-ngo-green outline-none"
               value={formData.broughtBy}
-              onChange={(e) => setFormData({ ...formData, broughtBy: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, broughtBy: e.target.value })
+              }
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Reason for Coming *</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Reason for Coming *
+            </label>
             <input
               type="text"
               required
               placeholder="e.g., Homeless, Missing"
               className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-ngo-green outline-none"
               value={formData.reason}
-              onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, reason: e.target.value })
+              }
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Upload Photo</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Upload Photo
+            </label>
             <input
               type="file"
               id="photo-upload"
               accept="image/*"
               className="w-full px-4 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-ngo-green outline-none file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:bg-green-50 file:text-ngo-green hover:file:bg-green-100 transition-colors"
-              onChange={(e) => setFormData({ ...formData, image: e.target.files[0] })}
+              onChange={(e) =>
+                setFormData({ ...formData, image: e.target.files[0] })
+              }
             />
           </div>
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Physical Condition / Remarks</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Physical Condition / Remarks
+            </label>
             <textarea
               rows="2"
               className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-ngo-green outline-none resize-none"
               value={formData.condition}
-              onChange={(e) => setFormData({ ...formData, condition: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, condition: e.target.value })
+              }
             ></textarea>
           </div>
         </div>

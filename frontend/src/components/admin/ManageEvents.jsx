@@ -19,9 +19,12 @@ const ManageEvents = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("adminToken");
-      const res = await fetch("http://localhost:5000/api/events/all", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        "https://maaastha-website-etur.onrender.com/api/events/all",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       const json = await res.json();
       if (json.success) setEvents(json.data);
     } catch (e) {
@@ -39,10 +42,13 @@ const ManageEvents = () => {
     if (!window.confirm("Delete this event permanently?")) return;
     try {
       const token = localStorage.getItem("adminToken");
-      const res = await fetch(`http://localhost:5000/api/events/delete/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `https://maaastha-website-etur.onrender.com/api/events/delete/${id}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
 
       const data = await res.json();
 
@@ -66,11 +72,14 @@ const ManageEvents = () => {
         if (formData[key] !== null && formData[key] !== "")
           dataToSend.append(key, formData[key]);
       });
-      const response = await fetch("http://localhost:5000/api/events/add", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: dataToSend,
-      });
+      const response = await fetch(
+        "https://maaastha-website-etur.onrender.com/api/events/add",
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: dataToSend,
+        },
+      );
       const data = await response.json();
       if (data.success) {
         alert("Event published successfully!");
@@ -214,7 +223,7 @@ const ManageEvents = () => {
                       src={
                         evt.imageUrl.startsWith("http")
                           ? evt.imageUrl
-                          : `http://localhost:5000${evt.imageUrl}`
+                          : `https://maaastha-website-etur.onrender.com${evt.imageUrl}`
                       }
                       alt={evt.title}
                       className="w-full h-full object-cover"

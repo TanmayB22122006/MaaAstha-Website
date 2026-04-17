@@ -26,9 +26,12 @@ const RescueRequests = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("adminToken");
-      const res = await fetch("http://localhost:5000/api/rescue-requests/all", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        "https://maaastha-website-etur.onrender.com/api/rescue-requests/all",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       const json = await res.json();
       if (json.success) setRequests(json.data);
     } catch (e) {
@@ -47,7 +50,7 @@ const RescueRequests = () => {
     try {
       const token = localStorage.getItem("adminToken");
       const res = await fetch(
-        `http://localhost:5000/api/rescue-requests/update/${id}`,
+        `https://maaastha-website-etur.onrender.com/api/rescue-requests/update/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -71,7 +74,7 @@ const RescueRequests = () => {
     try {
       const token = localStorage.getItem("adminToken");
       const res = await fetch(
-        `http://localhost:5000/api/rescue-requests/delete/${id}`,
+        `https://maaastha-website-etur.onrender.com/api/rescue-requests/delete/${id}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
@@ -444,7 +447,7 @@ const RescueRequests = () => {
                         src={
                           selectedReq.photoUrl.startsWith("http")
                             ? selectedReq.photoUrl
-                            : `http://localhost:5000${selectedReq.photoUrl}`
+                            : `https://maaastha-website-etur.onrender.com${selectedReq.photoUrl}`
                         }
                         alt="Rescue Subject"
                         className="w-full h-full object-cover"

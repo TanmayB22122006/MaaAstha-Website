@@ -29,11 +29,14 @@ const Volunteer = () => {
         age: Number(formData.age),
       };
 
-      const response = await fetch("http://localhost:5000/api/volunteers/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const response = await fetch(
+        "https://maaastha-website-etur.onrender.com/api/volunteers/add",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        },
+      );
       const data = await response.json();
 
       if (response.ok && data.success) {

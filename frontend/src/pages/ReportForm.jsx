@@ -32,14 +32,17 @@ const ReportForm = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/reports", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          personName: person.name || person.fullName,
-        }),
-      });
+      const res = await fetch(
+        "https://maaastha-website-etur.onrender.com/api/reports",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...formData,
+            personName: person.name || person.fullName,
+          }),
+        },
+      );
 
       if (res.ok) {
         alert(

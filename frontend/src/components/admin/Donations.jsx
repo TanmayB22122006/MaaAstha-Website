@@ -18,9 +18,12 @@ const Donations = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("adminToken");
-      const res = await fetch("http://localhost:5000/api/donations/all", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        "https://maaastha-website-etur.onrender.com/api/donations/all",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       const json = await res.json();
       if (json.success) setDonations(json.data);
     } catch (e) {
@@ -39,7 +42,7 @@ const Donations = () => {
     try {
       const token = localStorage.getItem("adminToken");
       const res = await fetch(
-        `http://localhost:5000/api/donations/update/${id}`,
+        `https://maaastha-website-etur.onrender.com/api/donations/update/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -60,7 +63,7 @@ const Donations = () => {
     try {
       const token = localStorage.getItem("adminToken");
       const res = await fetch(
-        `http://localhost:5000/api/donations/delete/${id}`,
+        `https://maaastha-website-etur.onrender.com/api/donations/delete/${id}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },

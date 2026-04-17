@@ -7,7 +7,9 @@ const Events = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/events/all");
+        const response = await fetch(
+          "https://maaastha-website-etur.onrender.com/api/events/all",
+        );
         const data = await response.json();
         if (data.success) {
           setEvents(data.data);
