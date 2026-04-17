@@ -42,7 +42,8 @@
 
 - **Client-Side Rendering:** Utilizing React's Virtual DOM for a seamless, app-like user experience.
 - **RESTful APIs:** The Express backend exposes secure endpoints for CRUD operations.
-- **Middleware Integration:** \* `authMiddleware`: Verifies JWT tokens to protect Admin routes.
+- **Middleware Integration:**
+  - `authMiddleware`: Verifies JWT tokens to protect Admin routes.
   - `multerMiddleware`: Intercepts `multipart/form-data` to safely upload images to Cloudinary before storing the secure URL in MongoDB.
 
 ---
