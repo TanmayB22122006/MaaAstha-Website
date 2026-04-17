@@ -5,13 +5,17 @@ const addEvent = async (req, res) => {
     const { title, date, location, description } = req.body;
 
     if (!title || !date || !location || !description) {
-      return res.status(400).json({ success: false, message: "Please fill all fields" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Please fill all fields" });
     }
 
     const imageUrl = req.file ? req.file.path : "";
-    
+
     if (!imageUrl) {
-      return res.status(400).json({ success: false, message: "Event photo is mandatory" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Event photo is mandatory" });
     }
 
     const newEvent = await Event.create({
@@ -40,7 +44,9 @@ const getEvents = async (req, res) => {
 const deleteEvent = async (req, res) => {
   try {
     await Event.findByIdAndDelete(req.params.id);
-    res.status(200).json({ success: true, message: "Event deleted successfully" });
+    res
+      .status(200)
+      .json({ success: true, message: "Event deleted successfully" });
   } catch (error) {
     res.status(500).json({ success: false, message: "Delete failed" });
   }

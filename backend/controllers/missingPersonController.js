@@ -56,12 +56,10 @@ const deleteMissingPerson = async (req, res) => {
     }
 
     await MissingPerson.findByIdAndDelete(req.params.id);
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Deleted successfully from Cloud and DB",
-      });
+    res.status(200).json({
+      success: true,
+      message: "Deleted successfully from Cloud and DB",
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: "Delete failed" });
   }
