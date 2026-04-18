@@ -1,4 +1,4 @@
-# 🌿 Maa Astha NGO - Community Field Project
+# 🌿 Maa Astha samajik seva sanstha (beghar nivara kendra) - Community Field Project
 
 ![MERN Stack](https://img.shields.io/badge/MERN-Stack-059669?style=for-the-badge&logo=mongodb)
 ![React](https://img.shields.io/badge/React-18.x-059669?style=for-the-badge&logo=react)
@@ -50,10 +50,11 @@
 
 ## 👥 Contributors
 
+- **Tanmay Purushottam Bokade**
 - **Kush Nitesh Patel**
 - **Abhay Sudhir Panchal**
 - **Dhanaraj Sudhakar More**
-- **Tanmay Purushottam Bokade**
+
 
 ---
 
